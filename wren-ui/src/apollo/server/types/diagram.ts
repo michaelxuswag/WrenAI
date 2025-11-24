@@ -1,11 +1,11 @@
-import { RelationType } from '@server/types';
+import { RelationType } from "@server/types";
 
 export enum NodeType {
-  MODEL = 'MODEL',
-  VIEW = 'VIEW',
-  RELATION = 'RELATION',
-  FIELD = 'FIELD',
-  CALCULATED_FIELD = 'CALCULATED_FIELD',
+  MODEL = "MODEL",
+  VIEW = "VIEW",
+  RELATION = "RELATION",
+  FIELD = "FIELD",
+  CALCULATED_FIELD = "CALCULATED_FIELD",
 }
 
 export interface Diagram {

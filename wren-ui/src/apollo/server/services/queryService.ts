@@ -1,19 +1,19 @@
-import { DataSourceName } from '@server/types';
-import { Manifest } from '@server/mdl/type';
-import { IWrenEngineAdaptor } from '../adaptors/wrenEngineAdaptor';
+import { DataSourceName } from "@server/types";
+import { Manifest } from "@server/mdl/type";
+import { IWrenEngineAdaptor } from "../adaptors/wrenEngineAdaptor";
 import {
   SupportedDataSource,
   IIbisAdaptor,
   IbisQueryResponse,
   ValidationRules,
   IbisResponse,
-} from '../adaptors/ibisAdaptor';
-import { getLogger } from '@server/utils';
-import { Project } from '../repositories';
-import { PostHogTelemetry, TelemetryEvent } from '../telemetry/telemetry';
+} from "../adaptors/ibisAdaptor";
+import { getLogger } from "@server/utils";
+import { Project } from "../repositories";
+import { PostHogTelemetry, TelemetryEvent } from "../telemetry/telemetry";
 
-const logger = getLogger('QueryService');
-logger.level = 'debug';
+const logger = getLogger("QueryService");
+logger.level = "debug";
 
 export const DEFAULT_PREVIEW_LIMIT = 500;
 
@@ -110,20 +110,20 @@ export class QueryService implements IQueryService {
     const { type: dataSource, connectionInfo } = project;
     if (this.useEngine(dataSource)) {
       if (dryRun) {
-        logger.debug('Using wren engine to dry run');
+        logger.debug("Using wren engine to dry run");
         await this.wrenEngineAdaptor.dryRun(sql, {
           manifest: mdl,
           limit,
         });
         return true;
       } else {
-        logger.debug('Using wren engine to preview');
+        logger.debug("Using wren engine to preview");
         const data = await this.wrenEngineAdaptor.previewData(sql, mdl, limit);
         return data as PreviewDataResponse;
       }
     } else {
       this.checkDataSourceIsSupported(dataSource);
-      logger.debug('Use ibis adaptor to preview');
+      logger.debug("Use ibis adaptor to preview");
       if (dryRun) {
         return await this.ibisDryRun(sql, dataSource, connectionInfo, mdl);
       } else {
@@ -250,14 +250,14 @@ export class QueryService implements IQueryService {
     const columns = data.columns;
     const dtypes = data.dtypes;
     const transformedColumns = columns.map((column) => {
-      let type = 'unknown';
+      let type = "unknown";
       if (dtypes && dtypes[column]) {
-        type = dtypes[column] === 'object' ? 'string' : dtypes[column];
+        type = dtypes[column] === "object" ? "string" : dtypes[column];
       }
-      if (type === 'unknown') {
+      if (type === "unknown") {
         logger.debug(`Did not find type mapping for "${column}"`);
         logger.debug(
-          `dtypes mapping: ${dtypes ? JSON.stringify(dtypes, null, 2) : 'undefined'} `,
+          `dtypes mapping: ${dtypes ? JSON.stringify(dtypes, null, 2) : "undefined"} `,
         );
       }
       return {

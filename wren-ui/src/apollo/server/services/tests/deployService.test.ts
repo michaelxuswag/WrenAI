@@ -1,7 +1,7 @@
-import { DeployService } from '../deployService';
-import { DeployStatusEnum } from '@server/repositories/deployLogRepository';
+import { DeployService } from "../deployService";
+import { DeployStatusEnum } from "@server/repositories/deployLogRepository";
 
-describe('DeployService', () => {
+describe("DeployService", () => {
   let mockWrenAIAdaptor;
 
   let mockDeployLogRepository;
@@ -24,12 +24,12 @@ describe('DeployService', () => {
     });
   });
 
-  it('should successfully deploy when there is no existing deployment with the same hash', async () => {
-    const manifest = { key: 'value' };
+  it("should successfully deploy when there is no existing deployment with the same hash", async () => {
+    const manifest = { key: "value" };
     const projectId = 1;
 
     mockDeployLogRepository.findLastProjectDeployLog.mockResolvedValue(null);
-    mockWrenAIAdaptor.deploy.mockResolvedValue({ status: 'SUCCESS' });
+    mockWrenAIAdaptor.deploy.mockResolvedValue({ status: "SUCCESS" });
     mockDeployLogRepository.createOne.mockResolvedValue({ id: 123 });
 
     const response = await deployService.deploy(manifest, projectId);
@@ -41,25 +41,25 @@ describe('DeployService', () => {
     });
   });
 
-  it('should return failed status if ai-service deployment fails', async () => {
-    const manifest = { key: 'value' };
+  it("should return failed status if ai-service deployment fails", async () => {
+    const manifest = { key: "value" };
     const projectId = 1;
 
     mockDeployLogRepository.findLastProjectDeployLog.mockResolvedValue(null);
     mockWrenAIAdaptor.deploy.mockResolvedValue({
-      status: 'FAILED',
-      error: 'AI error',
+      status: "FAILED",
+      error: "AI error",
     });
     mockDeployLogRepository.createOne.mockResolvedValue({ id: 123 });
 
     const response = await deployService.deploy(manifest, projectId);
 
     expect(response.status).toEqual(DeployStatusEnum.FAILED);
-    expect(response.error).toEqual('AI error');
+    expect(response.error).toEqual("AI error");
   });
 
-  it('should skip deployment if an existing deployment with the same hash exists', async () => {
-    const manifest = { key: 'value' };
+  it("should skip deployment if an existing deployment with the same hash exists", async () => {
+    const manifest = { key: "value" };
     const projectId = 1;
 
     mockDeployLogRepository.findLastProjectDeployLog.mockResolvedValue({

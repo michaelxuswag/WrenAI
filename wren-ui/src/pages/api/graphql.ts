@@ -29,6 +29,7 @@ export const config: PageConfig = {
 
 const bootstrapServer = async () => {
   const {
+    knex,
     telemetry,
 
     // repositories
@@ -127,6 +128,7 @@ const bootstrapServer = async () => {
     introspection: process.env.NODE_ENV !== 'production',
     context: (): IContext => ({
       config: serverConfig,
+      knex,
       telemetry,
       // adaptor
       wrenEngineAdaptor,

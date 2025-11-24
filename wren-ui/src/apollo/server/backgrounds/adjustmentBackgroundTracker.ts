@@ -1,22 +1,22 @@
-import { getLogger } from '@server/utils';
+import { getLogger } from "@server/utils";
 import {
   AskFeedbackInput,
   AskFeedbackResult,
   AskFeedbackStatus,
-} from '@server/models/adaptor';
+} from "@server/models/adaptor";
 import {
   AskingTask,
   IAskingTaskRepository,
   IThreadResponseRepository,
   ThreadResponse,
   ThreadResponseAdjustmentType,
-} from '@server/repositories';
-import { IWrenAIAdaptor } from '../adaptors';
-import { TelemetryEvent, WrenService } from '../telemetry/telemetry';
-import { PostHogTelemetry } from '../telemetry/telemetry';
+} from "@server/repositories";
+import { IWrenAIAdaptor } from "../adaptors";
+import { TelemetryEvent, WrenService } from "../telemetry/telemetry";
+import { PostHogTelemetry } from "../telemetry/telemetry";
 
-const logger = getLogger('AdjustmentTaskTracker');
-logger.level = 'debug';
+const logger = getLogger("AdjustmentTaskTracker");
+logger.level = "debug";
 
 interface TrackedTask {
   queryId: string;
@@ -403,7 +403,7 @@ export class AdjustmentBackgroundTaskTracker
     Promise.allSettled(jobs.map((job) => job())).then((results) => {
       // Log any rejected promises
       results.forEach((result, index) => {
-        if (result.status === 'rejected') {
+        if (result.status === "rejected") {
           logger.error(`Job ${index} failed: ${result.reason}`);
         }
       });
@@ -412,7 +412,7 @@ export class AdjustmentBackgroundTaskTracker
       if (tasksToRemove.length > 0) {
         logger.info(
           `Cleaning up tasks that have been in memory too long. Tasks: ${tasksToRemove.join(
-            ', ',
+            ", ",
           )}`,
         );
       }
@@ -473,7 +473,7 @@ export class AdjustmentBackgroundTaskTracker
     }
 
     if (!taskRecord) {
-      throw new Error('Asking task not found');
+      throw new Error("Asking task not found");
     }
 
     // update the task

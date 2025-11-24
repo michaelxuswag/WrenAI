@@ -1,12 +1,12 @@
-import { Knex } from 'knex';
-import { BaseRepository, IBasicRepository } from './baseRepository';
+import { Knex } from "knex";
+import { BaseRepository, IBasicRepository } from "./baseRepository";
 import {
   camelCase,
   isPlainObject,
   mapKeys,
   mapValues,
   snakeCase,
-} from 'lodash';
+} from "lodash";
 
 export interface Instruction {
   id: number;
@@ -24,20 +24,20 @@ export class InstructionRepository
   extends BaseRepository<Instruction>
   implements IInstructionRepository
 {
-  private readonly jsonbColumns = ['questions'];
+  private readonly jsonbColumns = ["questions"];
 
   constructor(knexPg: Knex) {
-    super({ knexPg, tableName: 'instruction' });
+    super({ knexPg, tableName: "instruction" });
   }
 
   protected override transformFromDBData = (data: any) => {
     if (!isPlainObject(data)) {
-      throw new Error('Unexpected dbdata');
+      throw new Error("Unexpected dbdata");
     }
     const camelCaseData = mapKeys(data, (_value, key) => camelCase(key));
     const transformData = mapValues(camelCaseData, (value, key) => {
       if (this.jsonbColumns.includes(key)) {
-        if (typeof value === 'string') {
+        if (typeof value === "string") {
           return value ? JSON.parse(value) : value;
         } else {
           return value;
@@ -50,7 +50,7 @@ export class InstructionRepository
 
   protected override transformToDBData = (data: any) => {
     if (!isPlainObject(data)) {
-      throw new Error('Unexpected dbdata');
+      throw new Error("Unexpected dbdata");
     }
     const transformedData = mapValues(data, (value, key) => {
       if (this.jsonbColumns.includes(key)) {

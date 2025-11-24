@@ -1,24 +1,24 @@
-import { IContext } from '@server/types';
-import { ChartType } from '@server/models/adaptor';
+import { IContext } from "@server/types";
+import { ChartType } from "@server/models/adaptor";
 import {
   UpdateDashboardItemLayouts,
   PreviewDataResponse,
   DEFAULT_PREVIEW_LIMIT,
-} from '@server/services';
+} from "@server/services";
 import {
   Dashboard,
   DashboardItem,
   DashboardItemType,
-} from '@server/repositories';
-import { getLogger } from '@server/utils';
+} from "@server/repositories";
+import { getLogger } from "@server/utils";
 import {
   SetDashboardCacheData,
   DashboardSchedule,
   PreviewItemResponse,
-} from '@server/models/dashboard';
+} from "@server/models/dashboard";
 
-const logger = getLogger('DashboardResolver');
-logger.level = 'debug';
+const logger = getLogger("DashboardResolver");
+logger.level = "debug";
 
 export class DashboardResolver {
   constructor() {
@@ -38,7 +38,7 @@ export class DashboardResolver {
     _args: any,
     ctx: IContext,
   ): Promise<
-    Omit<Dashboard, 'nextScheduledAt'> & {
+    Omit<Dashboard, "nextScheduledAt"> & {
       schedule: DashboardSchedule;
       items: DashboardItem[];
       nextScheduledAt: string | null;
@@ -46,7 +46,7 @@ export class DashboardResolver {
   > {
     const dashboard = await ctx.dashboardService.getCurrentDashboard();
     if (!dashboard) {
-      throw new Error('Dashboard not found.');
+      throw new Error("Dashboard not found.");
     }
     const schedule = ctx.dashboardService.parseCronExpression(dashboard);
     const items = await ctx.dashboardService.getDashboardItems(dashboard.id);
@@ -67,7 +67,7 @@ export class DashboardResolver {
   ): Promise<DashboardItem[]> {
     const dashboard = await ctx.dashboardService.getCurrentDashboard();
     if (!dashboard) {
-      throw new Error('Dashboard not found.');
+      throw new Error("Dashboard not found.");
     }
     return await ctx.dashboardService.getDashboardItems(dashboard.id);
   }
@@ -147,7 +147,7 @@ export class DashboardResolver {
   ): Promise<DashboardItem[]> {
     const { layouts } = args.data;
     if (layouts.length === 0) {
-      throw new Error('Layouts are required.');
+      throw new Error("Layouts are required.");
     }
     return await ctx.dashboardService.updateDashboardItemLayouts(layouts);
   }
@@ -200,7 +200,7 @@ export class DashboardResolver {
     try {
       const dashboard = await ctx.dashboardService.getCurrentDashboard();
       if (!dashboard) {
-        throw new Error('Dashboard not found.');
+        throw new Error("Dashboard not found.");
       }
 
       return await ctx.dashboardService.setDashboardSchedule(

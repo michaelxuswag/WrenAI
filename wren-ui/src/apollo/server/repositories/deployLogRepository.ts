@@ -1,6 +1,6 @@
-import { Knex } from 'knex';
-import { BaseRepository, IBasicRepository } from './baseRepository';
-import { camelCase, isPlainObject, mapKeys, mapValues } from 'lodash';
+import { Knex } from "knex";
+import { BaseRepository, IBasicRepository } from "./baseRepository";
+import { camelCase, isPlainObject, mapKeys, mapValues } from "lodash";
 
 export interface Deploy {
   id: number; // ID
@@ -12,9 +12,9 @@ export interface Deploy {
 }
 
 export enum DeployStatusEnum {
-  IN_PROGRESS = 'IN_PROGRESS',
-  SUCCESS = 'SUCCESS',
-  FAILED = 'FAILED',
+  IN_PROGRESS = "IN_PROGRESS",
+  SUCCESS = "SUCCESS",
+  FAILED = "FAILED",
 }
 
 export interface IDeployLogRepository extends IBasicRepository<Deploy> {
@@ -27,24 +27,24 @@ export class DeployLogRepository
   implements IDeployLogRepository
 {
   constructor(knexPg: Knex) {
-    super({ knexPg, tableName: 'deploy_log' });
+    super({ knexPg, tableName: "deploy_log" });
   }
 
   public async findLastProjectDeployLog(projectId: number) {
     const res = await this.knex
-      .select('*')
+      .select("*")
       .from(this.tableName)
       .where(
         this.transformToDBData({ projectId, status: DeployStatusEnum.SUCCESS }),
       )
-      .orderBy('created_at', 'desc')
+      .orderBy("created_at", "desc")
       .first();
     return (res && this.transformFromDBData(res)) || null;
   }
 
   public async findInProgressProjectDeployLog(projectId: number) {
     const res = await this.knex
-      .select('*')
+      .select("*")
       .from(this.tableName)
       .where(
         this.transformToDBData({
@@ -52,20 +52,20 @@ export class DeployLogRepository
           status: DeployStatusEnum.IN_PROGRESS,
         }),
       )
-      .orderBy('created_at', 'desc')
+      .orderBy("created_at", "desc")
       .first();
     return (res && this.transformFromDBData(res)) || null;
   }
 
   public override transformFromDBData: (data: any) => Deploy = (data: any) => {
     if (!isPlainObject(data)) {
-      throw new Error('Unexpected dbdata');
+      throw new Error("Unexpected dbdata");
     }
     const camelCaseData = mapKeys(data, (_value, key) => camelCase(key));
     const formattedData = mapValues(camelCaseData, (value, key) => {
-      if (['manifest'].includes(key)) {
+      if (["manifest"].includes(key)) {
         // sqlite return a string for json field, but postgres return an object
-        return typeof value === 'string' ? JSON.parse(value) : value;
+        return typeof value === "string" ? JSON.parse(value) : value;
       }
       return value;
     });

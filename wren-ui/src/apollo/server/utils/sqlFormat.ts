@@ -1,7 +1,7 @@
-import { format, FormatOptionsWithLanguage } from 'sql-formatter';
-import { getLogger } from './logger';
+import { format, FormatOptionsWithLanguage } from "sql-formatter";
+import { getLogger } from "./logger";
 
-const logger = getLogger('SQL Format');
+const logger = getLogger("SQL Format");
 
 export function safeFormatSQL(
   sql: string,
@@ -13,7 +13,7 @@ export function safeFormatSQL(
     try {
       logger.debug(`Fallback to Trino dialect for SQL formatting...`);
       // Try using Trino as the fallback dialect
-      return format(sql, { ...options, language: 'trino' });
+      return format(sql, { ...options, language: "trino" });
     } catch (_fallbackError) {
       logger.error(`Failed to format SQL: ${err.message}`);
       return sql;

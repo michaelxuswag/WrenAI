@@ -1,32 +1,32 @@
 // Server-Sent Events (SSE) types for real-time streaming APIs
 export enum EventType {
-  MESSAGE_START = 'message_start',
-  MESSAGE_STOP = 'message_stop',
-  STATE = 'state',
-  CONTENT_BLOCK_START = 'content_block_start',
-  CONTENT_BLOCK_DELTA = 'content_block_delta',
-  CONTENT_BLOCK_STOP = 'content_block_stop',
-  ERROR = 'error',
+  MESSAGE_START = "message_start",
+  MESSAGE_STOP = "message_stop",
+  STATE = "state",
+  CONTENT_BLOCK_START = "content_block_start",
+  CONTENT_BLOCK_DELTA = "content_block_delta",
+  CONTENT_BLOCK_STOP = "content_block_stop",
+  ERROR = "error",
 }
 
 export enum StateType {
-  SQL_GENERATION_START = 'sql_generation_start',
-  SQL_GENERATION_UNDERSTANDING = 'sql_generation_understanding',
-  SQL_GENERATION_SEARCHING = 'sql_generation_searching',
-  SQL_GENERATION_PLANNING = 'sql_generation_planning',
-  SQL_GENERATION_GENERATING = 'sql_generation_generating',
-  SQL_GENERATION_CORRECTING = 'sql_generation_correcting',
-  SQL_GENERATION_FINISHED = 'sql_generation_finished',
-  SQL_GENERATION_FAILED = 'sql_generation_failed',
-  SQL_GENERATION_STOPPED = 'sql_generation_stopped',
-  SQL_GENERATION_SUCCESS = 'sql_generation_success',
-  SQL_EXECUTION_START = 'sql_execution_start',
-  SQL_EXECUTION_END = 'sql_execution_end',
+  SQL_GENERATION_START = "sql_generation_start",
+  SQL_GENERATION_UNDERSTANDING = "sql_generation_understanding",
+  SQL_GENERATION_SEARCHING = "sql_generation_searching",
+  SQL_GENERATION_PLANNING = "sql_generation_planning",
+  SQL_GENERATION_GENERATING = "sql_generation_generating",
+  SQL_GENERATION_CORRECTING = "sql_generation_correcting",
+  SQL_GENERATION_FINISHED = "sql_generation_finished",
+  SQL_GENERATION_FAILED = "sql_generation_failed",
+  SQL_GENERATION_STOPPED = "sql_generation_stopped",
+  SQL_GENERATION_SUCCESS = "sql_generation_success",
+  SQL_EXECUTION_START = "sql_execution_start",
+  SQL_EXECUTION_END = "sql_execution_end",
 }
 
 export enum ContentBlockContentType {
-  SUMMARY_GENERATION = 'summary_generation',
-  EXPLANATION = 'explanation',
+  SUMMARY_GENERATION = "summary_generation",
+  EXPLANATION = "explanation",
 }
 
 // Interfaces for request and events
@@ -64,7 +64,7 @@ export interface StateEvent extends BaseEvent {
 export interface ContentBlockStartEvent extends BaseEvent {
   type: EventType.CONTENT_BLOCK_START;
   content_block: {
-    type: 'text';
+    type: "text";
     name: ContentBlockContentType;
   };
 }
@@ -72,7 +72,7 @@ export interface ContentBlockStartEvent extends BaseEvent {
 export interface ContentBlockDeltaEvent extends BaseEvent {
   type: EventType.CONTENT_BLOCK_DELTA;
   delta: {
-    type: 'text_delta';
+    type: "text_delta";
     text: string;
   };
 }

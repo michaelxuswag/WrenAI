@@ -1,14 +1,14 @@
-import axios from 'axios';
+import axios from "axios";
 import {
   DryRunResponse,
   IbisAdaptor,
   IbisQueryOptions,
   IbisQueryResponse,
   ValidationRules,
-} from '../ibisAdaptor';
-import { DataSourceName } from '../../types';
-import { Manifest } from '../../mdl/type';
-import { DialectSQL } from '../../models/adaptor';
+} from "../ibisAdaptor";
+import { DataSourceName } from "../../types";
+import { Manifest } from "../../mdl/type";
+import { DialectSQL } from "../../models/adaptor";
 import {
   BIG_QUERY_CONNECTION_INFO,
   CLICK_HOUSE_CONNECTION_INFO,
@@ -17,109 +17,109 @@ import {
   POSTGRES_CONNECTION_INFO,
   TRINO_CONNECTION_INFO,
   SNOWFLAKE_CONNECTION_INFO,
-} from '../../repositories';
-import { snakeCase } from 'lodash';
-import { Encryptor } from '../../utils';
-import { DEFAULT_PREVIEW_LIMIT } from '../../services';
+} from "../../repositories";
+import { snakeCase } from "lodash";
+import { Encryptor } from "../../utils";
+import { DEFAULT_PREVIEW_LIMIT } from "../../services";
 
-jest.mock('axios');
-jest.mock('@server/utils/encryptor');
+jest.mock("axios");
+jest.mock("@server/utils/encryptor");
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 // mock encryptor
 const mockedEncryptor = Encryptor as jest.MockedClass<typeof Encryptor>;
 
-describe('IbisAdaptor', () => {
+describe("IbisAdaptor", () => {
   let ibisAdaptor: IbisAdaptor;
-  const ibisServerEndpoint = 'http://localhost:8080';
+  const ibisServerEndpoint = "http://localhost:8080";
 
   const mockMSSQLConnectionInfo: MS_SQL_CONNECTION_INFO = {
-    host: 'localhost',
+    host: "localhost",
     port: 1433,
-    database: 'my-database',
-    user: 'my-user',
-    password: 'my-password',
+    database: "my-database",
+    user: "my-user",
+    password: "my-password",
     trustServerCertificate: false,
   };
 
   const mockMySQLConnectionInfo: MYSQL_CONNECTION_INFO = {
-    host: 'localhost',
+    host: "localhost",
     port: 3306,
-    database: 'my-database',
-    user: 'my-user',
-    password: 'my-password',
+    database: "my-database",
+    user: "my-user",
+    password: "my-password",
     ssl: false,
   };
 
   const mockPostgresConnectionInfo: POSTGRES_CONNECTION_INFO = {
-    host: 'localhost',
+    host: "localhost",
     port: 5432,
-    database: 'my-database',
-    user: 'my-user',
-    password: 'my-password',
+    database: "my-database",
+    user: "my-user",
+    password: "my-password",
     ssl: true,
   };
 
   const mockClickHouseConnectionInfo: CLICK_HOUSE_CONNECTION_INFO = {
-    host: 'my-host',
+    host: "my-host",
     port: 8443,
-    database: 'my-database',
-    user: 'my-user',
-    password: 'my-password',
+    database: "my-database",
+    user: "my-user",
+    password: "my-password",
     ssl: true,
   };
   const { host, port, database, user, password } = mockPostgresConnectionInfo;
   const postgresConnectionUrl = `postgresql://${user}:${password}@${host}:${port}/${database}?sslmode=require`;
 
   const mockBigQueryConnectionInfo: BIG_QUERY_CONNECTION_INFO = {
-    projectId: 'my-bq-project-id',
-    datasetId: 'my-bq-dataset-id',
-    credentials: 'encrypted-credential-string',
+    projectId: "my-bq-project-id",
+    datasetId: "my-bq-dataset-id",
+    credentials: "encrypted-credential-string",
   };
 
   const mockTrinoConnectionInfo: TRINO_CONNECTION_INFO = {
-    schemas: 'my-catalog.my-schema',
-    host: 'localhost',
+    schemas: "my-catalog.my-schema",
+    host: "localhost",
     port: 5450,
-    password: 'my-password',
+    password: "my-password",
     ssl: true,
-    username: 'my-username',
+    username: "my-username",
   };
 
   const mockSnowflakeConnectionInfo: SNOWFLAKE_CONNECTION_INFO = {
-    user: 'my-user',
-    password: 'my-password',
-    account: 'my-account',
-    database: 'my-database',
-    schema: 'my-schema',
+    user: "my-user",
+    password: "my-password",
+    account: "my-account",
+    database: "my-database",
+    schema: "my-schema",
   };
 
   const mockManifest: Manifest = {
-    catalog: 'wrenai', // eg: "test-catalog"
-    schema: 'wrenai', // eg: "test-schema"
+    catalog: "wrenai", // eg: "test-catalog"
+    schema: "wrenai", // eg: "test-schema"
     models: [
       {
-        name: 'test_table',
+        name: "test_table",
         tableReference: {
-          catalog: 'wrenai',
-          schema: 'wrenai',
-          table: 'test_table',
+          catalog: "wrenai",
+          schema: "wrenai",
+          table: "test_table",
         },
         properties: {
-          description: 'test table',
+          description: "test table",
         },
         columns: [
           {
-            name: 'id',
-            type: 'integer',
+            name: "id",
+            type: "integer",
             properties: {},
             isCalculated: false,
           },
           {
-            name: 'sumId',
-            type: 'float',
+            name: "sumId",
+            type: "float",
             properties: {},
             isCalculated: true,
-            expression: 'SUM(id)',
+            expression: "SUM(id)",
           },
         ],
         cached: false,
@@ -139,7 +139,7 @@ describe('IbisAdaptor', () => {
     jest.resetAllMocks();
   });
 
-  it('should get mssql constraints', async () => {
+  it("should get mssql constraints", async () => {
     const mockResponse = { data: [] };
     mockedAxios.post.mockResolvedValue(mockResponse);
     // mock decrypt method in Encryptor to return the same password
@@ -153,9 +153,9 @@ describe('IbisAdaptor', () => {
     );
     const expectConnectionInfo = Object.entries(mockMSSQLConnectionInfo).reduce(
       (acc, [key, value]) => {
-        if (key === 'trustServerCertificate') {
+        if (key === "trustServerCertificate") {
           if (value) {
-            acc['kwargs'] = { trustServerCertificate: 'YES' };
+            acc["kwargs"] = { trustServerCertificate: "YES" };
             return acc;
           }
         } else {
@@ -173,7 +173,7 @@ describe('IbisAdaptor', () => {
     );
   });
 
-  it('should get mysql constraints', async () => {
+  it("should get mysql constraints", async () => {
     const mockResponse = { data: [] };
     mockedAxios.post.mockResolvedValue(mockResponse);
     // mock decrypt method in Encryptor to return the same password
@@ -201,28 +201,28 @@ describe('IbisAdaptor', () => {
   it.each([
     [
       {
-        host: 'my-host',
+        host: "my-host",
         port: 8443,
-        database: 'my-database',
-        user: 'my-user',
-        password: 'my-password',
+        database: "my-database",
+        user: "my-user",
+        password: "my-password",
         ssl: true,
       },
       `clickhouse://my-user:my-password@my-host:8443/my-database?secure=1`,
     ],
     [
       {
-        host: 'my-host',
+        host: "my-host",
         port: 8443,
-        database: 'my-database',
-        user: 'my-user',
-        password: 'my-password',
+        database: "my-database",
+        user: "my-user",
+        password: "my-password",
         ssl: false,
       },
       `clickhouse://my-user:my-password@my-host:8443/my-database?`,
     ],
   ])(
-    'should get correct clickhouse connection info',
+    "should get correct clickhouse connection info",
     async (connectionInfo, expectConnectionUrl) => {
       const mockResponse = { data: [] };
       mockedAxios.post.mockResolvedValue(mockResponse);
@@ -247,7 +247,7 @@ describe('IbisAdaptor', () => {
     },
   );
 
-  it('should get trino constraints', async () => {
+  it("should get trino constraints", async () => {
     const mockResponse = { data: [] };
     mockedAxios.post.mockResolvedValue(mockResponse);
 
@@ -261,8 +261,8 @@ describe('IbisAdaptor', () => {
     );
 
     const { username, host, password, port, schemas } = mockTrinoConnectionInfo;
-    const schemasArray = schemas.split(',');
-    const [catalog, schema] = schemasArray[0].split('.');
+    const schemasArray = schemas.split(",");
+    const [catalog, schema] = schemasArray[0].split(".");
     const expectConnectionInfo = {
       catalog,
       host: `https://${host}`,
@@ -279,7 +279,7 @@ describe('IbisAdaptor', () => {
     );
   });
 
-  it('should get snowflake constraints', async () => {
+  it("should get snowflake constraints", async () => {
     const mockResponse = { data: [] };
     mockedAxios.post.mockResolvedValue(mockResponse);
     // mock decrypt method in Encryptor to return the same password
@@ -302,7 +302,7 @@ describe('IbisAdaptor', () => {
     );
   });
 
-  it('should get click house constraints', async () => {
+  it("should get click house constraints", async () => {
     const mockResponse = { data: [] };
     mockedAxios.post.mockResolvedValue(mockResponse);
     // mock decrypt method in Encryptor to return the same password
@@ -317,7 +317,7 @@ describe('IbisAdaptor', () => {
     const { user, password, host, port, database, ssl } =
       mockClickHouseConnectionInfo;
     const expectConnectionInfo = {
-      connectionUrl: `clickhouse://${user}:${password}@${host}:${port}/${database}${ssl ? '?secure=1' : ''}`,
+      connectionUrl: `clickhouse://${user}:${password}@${host}:${port}/${database}${ssl ? "?secure=1" : ""}`,
     };
 
     expect(result).toEqual([]);
@@ -327,7 +327,7 @@ describe('IbisAdaptor', () => {
     );
   });
 
-  it('should get postgres constraints', async () => {
+  it("should get postgres constraints", async () => {
     const mockResponse = { data: [] };
     mockedAxios.post.mockResolvedValue(mockResponse);
     mockedEncryptor.prototype.decrypt.mockReturnValue(
@@ -350,7 +350,7 @@ describe('IbisAdaptor', () => {
     );
   });
 
-  it('should get bigquery constraints', async () => {
+  it("should get bigquery constraints", async () => {
     const mockResponse = { data: [] };
     mockedAxios.post.mockResolvedValue(mockResponse);
     mockedEncryptor.prototype.decrypt.mockReturnValue(
@@ -363,10 +363,10 @@ describe('IbisAdaptor', () => {
     const expectConnectionInfo = Object.entries(
       mockBigQueryConnectionInfo,
     ).reduce((acc, [key, value]) => {
-      if (key === 'credentials') {
-        acc['credentials'] = Buffer.from(
+      if (key === "credentials") {
+        acc["credentials"] = Buffer.from(
           JSON.stringify(mockBigQueryConnectionInfo.credentials),
-        ).toString('base64');
+        ).toString("base64");
       } else {
         acc[snakeCase(key)] = value;
       }
@@ -380,15 +380,15 @@ describe('IbisAdaptor', () => {
     );
   });
 
-  it('should validate with rule COLUMN_IS_VALID', async () => {
+  it("should validate with rule COLUMN_IS_VALID", async () => {
     mockedAxios.post.mockResolvedValue(true);
     mockedEncryptor.prototype.decrypt.mockReturnValue(
       JSON.stringify({ password: mockPostgresConnectionInfo.password }),
     );
 
     const parameters = {
-      modelName: 'test_table',
-      columnName: 'sumId',
+      modelName: "test_table",
+      columnName: "sumId",
     };
     const result = await ibisAdaptor.validate(
       DataSourceName.POSTGRES,
@@ -404,18 +404,18 @@ describe('IbisAdaptor', () => {
       {
         connectionInfo: { connectionUrl: postgresConnectionUrl },
         manifestStr: Buffer.from(JSON.stringify(mockManifest)).toString(
-          'base64',
+          "base64",
         ),
         parameters,
       },
     );
   });
 
-  it('should handle error when validating', async () => {
-    const mockError = { response: { data: 'Error' } };
+  it("should handle error when validating", async () => {
+    const mockError = { response: { data: "Error" } };
     const parameters = {
-      modelName: 'test_table',
-      columnName: 'sumId',
+      modelName: "test_table",
+      columnName: "sumId",
     };
     mockedAxios.post.mockRejectedValue(mockError);
     mockedEncryptor.prototype.decrypt.mockReturnValue(
@@ -430,20 +430,20 @@ describe('IbisAdaptor', () => {
       parameters,
     );
 
-    expect(result).toEqual({ valid: false, message: 'Error' });
+    expect(result).toEqual({ valid: false, message: "Error" });
     expect(mockedAxios.post).toHaveBeenCalledWith(
       `${ibisServerEndpoint}/v3/connector/postgres/validate/column_is_valid`,
       {
         connectionInfo: { connectionUrl: postgresConnectionUrl },
         manifestStr: Buffer.from(JSON.stringify(mockManifest)).toString(
-          'base64',
+          "base64",
         ),
         parameters,
       },
     );
   });
 
-  it('should get data, correlationId and processTime', async () => {
+  it("should get data, correlationId and processTime", async () => {
     mockedAxios.post.mockResolvedValue({
       data: {
         columns: [],
@@ -451,8 +451,8 @@ describe('IbisAdaptor', () => {
         dtypes: {},
       },
       headers: {
-        'x-correlation-id': '123',
-        'x-process-time': '1s',
+        "x-correlation-id": "123",
+        "x-process-time": "1s",
       },
     });
     mockedEncryptor.prototype.decrypt.mockReturnValue(
@@ -460,7 +460,7 @@ describe('IbisAdaptor', () => {
     );
 
     const res: IbisQueryResponse = await ibisAdaptor.query(
-      'SELECT * FROM test_table',
+      "SELECT * FROM test_table",
       {
         dataSource: DataSourceName.POSTGRES,
         connectionInfo: mockPostgresConnectionInfo,
@@ -470,24 +470,24 @@ describe('IbisAdaptor', () => {
     );
 
     expect(res.data).toEqual([]);
-    expect(res.correlationId).toEqual('123');
-    expect(res.processTime).toEqual('1s');
+    expect(res.correlationId).toEqual("123");
+    expect(res.processTime).toEqual("1s");
   });
 
-  it('should handle query with cache-related headers', async () => {
+  it("should handle query with cache-related headers", async () => {
     mockedAxios.post.mockResolvedValue({
       data: {
-        columns: ['id'],
+        columns: ["id"],
         data: [[1]],
-        dtypes: { id: 'integer' },
+        dtypes: { id: "integer" },
       },
       headers: {
-        'x-correlation-id': '123',
-        'x-process-time': '1s',
-        'x-cache-hit': 'true',
-        'x-cache-create-at': '2024-01-01T00:00:00Z',
-        'x-cache-override': 'false',
-        'x-cache-override-at': '2024-01-01T00:00:00Z',
+        "x-correlation-id": "123",
+        "x-process-time": "1s",
+        "x-cache-hit": "true",
+        "x-cache-create-at": "2024-01-01T00:00:00Z",
+        "x-cache-override": "false",
+        "x-cache-override-at": "2024-01-01T00:00:00Z",
       },
     });
     mockedEncryptor.prototype.decrypt.mockReturnValue(
@@ -495,7 +495,7 @@ describe('IbisAdaptor', () => {
     );
 
     const res: IbisQueryResponse = await ibisAdaptor.query(
-      'SELECT * FROM test_table',
+      "SELECT * FROM test_table",
       {
         dataSource: DataSourceName.POSTGRES,
         connectionInfo: mockPostgresConnectionInfo,
@@ -505,8 +505,8 @@ describe('IbisAdaptor', () => {
     );
 
     expect(res.data).toEqual([[1]]);
-    expect(res.columns).toEqual(['id']);
-    expect(res.dtypes).toEqual({ id: 'integer' });
+    expect(res.columns).toEqual(["id"]);
+    expect(res.dtypes).toEqual({ id: "integer" });
     expect(res.cacheHit).toEqual(true);
     expect(new Date(res.cacheCreatedAt).getTime()).toBeGreaterThan(0);
     expect(res.override).toEqual(false);
@@ -518,16 +518,16 @@ describe('IbisAdaptor', () => {
     );
   });
 
-  it('should handle query with cache refresh', async () => {
+  it("should handle query with cache refresh", async () => {
     mockedAxios.post.mockResolvedValue({
       data: {
-        columns: ['id'],
+        columns: ["id"],
         data: [[1]],
-        dtypes: { id: 'integer' },
+        dtypes: { id: "integer" },
       },
       headers: {
-        'x-correlation-id': '123',
-        'x-process-time': '1s',
+        "x-correlation-id": "123",
+        "x-process-time": "1s",
       },
     });
     mockedEncryptor.prototype.decrypt.mockReturnValue(
@@ -535,7 +535,7 @@ describe('IbisAdaptor', () => {
     );
 
     const res: IbisQueryResponse = await ibisAdaptor.query(
-      'SELECT * FROM test_table',
+      "SELECT * FROM test_table",
       {
         dataSource: DataSourceName.POSTGRES,
         connectionInfo: mockPostgresConnectionInfo,
@@ -553,23 +553,23 @@ describe('IbisAdaptor', () => {
     );
   });
 
-  it('should use default limit when not specified', async () => {
+  it("should use default limit when not specified", async () => {
     mockedAxios.post.mockResolvedValue({
       data: {
-        columns: ['id'],
+        columns: ["id"],
         data: [[1]],
-        dtypes: { id: 'integer' },
+        dtypes: { id: "integer" },
       },
       headers: {
-        'x-correlation-id': '123',
-        'x-process-time': '1s',
+        "x-correlation-id": "123",
+        "x-process-time": "1s",
       },
     });
     mockedEncryptor.prototype.decrypt.mockReturnValue(
       JSON.stringify({ password: mockPostgresConnectionInfo.password }),
     );
 
-    await ibisAdaptor.query('SELECT * FROM test_table', {
+    await ibisAdaptor.query("SELECT * FROM test_table", {
       dataSource: DataSourceName.POSTGRES,
       connectionInfo: mockPostgresConnectionInfo,
       mdl: mockManifest,
@@ -586,16 +586,16 @@ describe('IbisAdaptor', () => {
     );
   });
 
-  it('should use custom limit when specified', async () => {
+  it("should use custom limit when specified", async () => {
     mockedAxios.post.mockResolvedValue({
       data: {
-        columns: ['id'],
+        columns: ["id"],
         data: [[1]],
-        dtypes: { id: 'integer' },
+        dtypes: { id: "integer" },
       },
       headers: {
-        'x-correlation-id': '123',
-        'x-process-time': '1s',
+        "x-correlation-id": "123",
+        "x-process-time": "1s",
       },
     });
     mockedEncryptor.prototype.decrypt.mockReturnValue(
@@ -603,7 +603,7 @@ describe('IbisAdaptor', () => {
     );
 
     const customLimit = 50;
-    await ibisAdaptor.query('SELECT * FROM test_table', {
+    await ibisAdaptor.query("SELECT * FROM test_table", {
       dataSource: DataSourceName.POSTGRES,
       connectionInfo: mockPostgresConnectionInfo,
       mdl: mockManifest,
@@ -621,13 +621,13 @@ describe('IbisAdaptor', () => {
     );
   });
 
-  it('should throw an exception with correlationId and processTime when query fails', async () => {
+  it("should throw an exception with correlationId and processTime when query fails", async () => {
     const mockError = {
       response: {
-        data: 'Error message',
+        data: "Error message",
         headers: {
-          'x-correlation-id': '123',
-          'x-process-time': '1s',
+          "x-correlation-id": "123",
+          "x-process-time": "1s",
         },
       },
     };
@@ -637,28 +637,28 @@ describe('IbisAdaptor', () => {
     );
 
     await expect(
-      ibisAdaptor.query('SELECT * FROM test_table', {
+      ibisAdaptor.query("SELECT * FROM test_table", {
         dataSource: DataSourceName.POSTGRES,
         connectionInfo: mockPostgresConnectionInfo,
         mdl: mockManifest,
         limit: 10,
       }),
     ).rejects.toMatchObject({
-      message: 'Error message',
+      message: "Error message",
       extensions: {
         other: {
-          correlationId: '123',
-          processTime: '1s',
+          correlationId: "123",
+          processTime: "1s",
         },
       },
     });
   });
 
-  it('should get data, correlationId and processTime when dry run succeeds', async () => {
+  it("should get data, correlationId and processTime when dry run succeeds", async () => {
     mockedAxios.post.mockResolvedValue({
       headers: {
-        'x-correlation-id': '123',
-        'x-process-time': '1s',
+        "x-correlation-id": "123",
+        "x-process-time": "1s",
       },
     });
     mockedEncryptor.prototype.decrypt.mockReturnValue(
@@ -666,7 +666,7 @@ describe('IbisAdaptor', () => {
     );
 
     const res: DryRunResponse = await ibisAdaptor.dryRun(
-      'SELECT * FROM test_table',
+      "SELECT * FROM test_table",
       {
         dataSource: DataSourceName.POSTGRES,
         connectionInfo: mockPostgresConnectionInfo,
@@ -674,17 +674,17 @@ describe('IbisAdaptor', () => {
       } as IbisQueryOptions,
     );
 
-    expect(res.correlationId).toEqual('123');
-    expect(res.processTime).toEqual('1s');
+    expect(res.correlationId).toEqual("123");
+    expect(res.processTime).toEqual("1s");
   });
 
-  it('should throw an exception with correlationId and processTime when dry run fails', async () => {
+  it("should throw an exception with correlationId and processTime when dry run fails", async () => {
     const mockError = {
       response: {
-        data: 'Error message',
+        data: "Error message",
         headers: {
-          'x-correlation-id': '123',
-          'x-process-time': '1s',
+          "x-correlation-id": "123",
+          "x-process-time": "1s",
         },
       },
     };
@@ -694,31 +694,31 @@ describe('IbisAdaptor', () => {
     );
 
     await expect(
-      ibisAdaptor.dryRun('SELECT * FROM test_table', {
+      ibisAdaptor.dryRun("SELECT * FROM test_table", {
         dataSource: DataSourceName.POSTGRES,
         connectionInfo: mockPostgresConnectionInfo,
         mdl: mockManifest,
       }),
     ).rejects.toMatchObject({
-      message: 'Error message',
+      message: "Error message",
       extensions: {
         other: {
-          correlationId: '123',
-          processTime: '1s',
+          correlationId: "123",
+          processTime: "1s",
         },
       },
     });
   });
 
-  it('should successfully substitute SQL with model', async () => {
-    const mockResponse = { data: 'SELECT * FROM substituted_table' };
+  it("should successfully substitute SQL with model", async () => {
+    const mockResponse = { data: "SELECT * FROM substituted_table" };
     mockedAxios.post.mockResolvedValue(mockResponse);
     mockedEncryptor.prototype.decrypt.mockReturnValue(
       JSON.stringify({ password: mockPostgresConnectionInfo.password }),
     );
 
     const result = await ibisAdaptor.modelSubstitute(
-      'SELECT * FROM test_table' as DialectSQL,
+      "SELECT * FROM test_table" as DialectSQL,
       {
         dataSource: DataSourceName.POSTGRES,
         connectionInfo: mockPostgresConnectionInfo,
@@ -726,32 +726,32 @@ describe('IbisAdaptor', () => {
       },
     );
 
-    expect(result).toEqual('SELECT * FROM substituted_table');
+    expect(result).toEqual("SELECT * FROM substituted_table");
     expect(mockedAxios.post).toHaveBeenCalledWith(
       `${ibisServerEndpoint}/v3/connector/postgres/model-substitute`,
       {
-        sql: 'SELECT * FROM test_table',
+        sql: "SELECT * FROM test_table",
         connectionInfo: { connectionUrl: postgresConnectionUrl },
         manifestStr: Buffer.from(JSON.stringify(mockManifest)).toString(
-          'base64',
+          "base64",
         ),
       },
       {
         headers: {
-          'X-User-CATALOG': undefined,
-          'X-User-SCHEMA': undefined,
+          "X-User-CATALOG": undefined,
+          "X-User-SCHEMA": undefined,
         },
       },
     );
   });
 
-  it('should handle error when model substitution fails with MODEL_NOT_FOUND', async () => {
+  it("should handle error when model substitution fails with MODEL_NOT_FOUND", async () => {
     const mockError = {
       response: {
-        data: 'Model not found: test_table',
+        data: "Model not found: test_table",
         headers: {
-          'x-correlation-id': '123',
-          'x-process-time': '1s',
+          "x-correlation-id": "123",
+          "x-process-time": "1s",
         },
       },
     };
@@ -761,30 +761,30 @@ describe('IbisAdaptor', () => {
     );
 
     await expect(
-      ibisAdaptor.modelSubstitute('SELECT * FROM test_table' as DialectSQL, {
+      ibisAdaptor.modelSubstitute("SELECT * FROM test_table" as DialectSQL, {
         dataSource: DataSourceName.POSTGRES,
         connectionInfo: mockPostgresConnectionInfo,
         mdl: mockManifest,
       }),
     ).rejects.toMatchObject({
       message:
-        'Model not found: test_table. Try adding both catalog and schema before your table name. e.g. my_database.public.test_table',
+        "Model not found: test_table. Try adding both catalog and schema before your table name. e.g. my_database.public.test_table",
       extensions: {
         other: {
-          correlationId: '123',
-          processTime: '1s',
+          correlationId: "123",
+          processTime: "1s",
         },
       },
     });
   });
 
-  it('should handle error when model substitution fails with MODEL_NOT_FOUND and one dot in model name', async () => {
+  it("should handle error when model substitution fails with MODEL_NOT_FOUND and one dot in model name", async () => {
     const mockError = {
       response: {
-        data: 'Model not found: public.test_table',
+        data: "Model not found: public.test_table",
         headers: {
-          'x-correlation-id': '123',
-          'x-process-time': '1s',
+          "x-correlation-id": "123",
+          "x-process-time": "1s",
         },
       },
     };
@@ -795,7 +795,7 @@ describe('IbisAdaptor', () => {
 
     await expect(
       ibisAdaptor.modelSubstitute(
-        'SELECT * FROM public.test_table' as DialectSQL,
+        "SELECT * FROM public.test_table" as DialectSQL,
         {
           dataSource: DataSourceName.POSTGRES,
           connectionInfo: mockPostgresConnectionInfo,
@@ -804,23 +804,23 @@ describe('IbisAdaptor', () => {
       ),
     ).rejects.toMatchObject({
       message:
-        'Model not found: public.test_table. Try adding the catalog before the schema in your table name. e.g. my_database.public.test_table',
+        "Model not found: public.test_table. Try adding the catalog before the schema in your table name. e.g. my_database.public.test_table",
       extensions: {
         other: {
-          correlationId: '123',
-          processTime: '1s',
+          correlationId: "123",
+          processTime: "1s",
         },
       },
     });
   });
 
-  it('should handle error when model substitution fails with MODEL_NOT_FOUND and two dots in model name', async () => {
+  it("should handle error when model substitution fails with MODEL_NOT_FOUND and two dots in model name", async () => {
     const mockError = {
       response: {
-        data: 'Model not found: my_database.public.test_table',
+        data: "Model not found: my_database.public.test_table",
         headers: {
-          'x-correlation-id': '123',
-          'x-process-time': '1s',
+          "x-correlation-id": "123",
+          "x-process-time": "1s",
         },
       },
     };
@@ -831,7 +831,7 @@ describe('IbisAdaptor', () => {
 
     await expect(
       ibisAdaptor.modelSubstitute(
-        'SELECT * FROM my_database.public.test_table' as DialectSQL,
+        "SELECT * FROM my_database.public.test_table" as DialectSQL,
         {
           dataSource: DataSourceName.POSTGRES,
           connectionInfo: mockPostgresConnectionInfo,
@@ -840,23 +840,23 @@ describe('IbisAdaptor', () => {
       ),
     ).rejects.toMatchObject({
       message:
-        'Model not found: my_database.public.test_table. It may be missing from models, misnamed, or have a case mismatch.',
+        "Model not found: my_database.public.test_table. It may be missing from models, misnamed, or have a case mismatch.",
       extensions: {
         other: {
-          correlationId: '123',
-          processTime: '1s',
+          correlationId: "123",
+          processTime: "1s",
         },
       },
     });
   });
 
-  it('should handle error when model substitution fails with MODEL_NOT_FOUND and more than two dots in model name', async () => {
+  it("should handle error when model substitution fails with MODEL_NOT_FOUND and more than two dots in model name", async () => {
     const mockError = {
       response: {
-        data: 'Model not found: my_database.public.schema.test_table',
+        data: "Model not found: my_database.public.schema.test_table",
         headers: {
-          'x-correlation-id': '123',
-          'x-process-time': '1s',
+          "x-correlation-id": "123",
+          "x-process-time": "1s",
         },
       },
     };
@@ -867,7 +867,7 @@ describe('IbisAdaptor', () => {
 
     await expect(
       ibisAdaptor.modelSubstitute(
-        'SELECT * FROM my_database.public.schema.test_table' as DialectSQL,
+        "SELECT * FROM my_database.public.schema.test_table" as DialectSQL,
         {
           dataSource: DataSourceName.POSTGRES,
           connectionInfo: mockPostgresConnectionInfo,
@@ -876,23 +876,23 @@ describe('IbisAdaptor', () => {
       ),
     ).rejects.toMatchObject({
       message:
-        'Model not found: my_database.public.schema.test_table. It may be missing from models, misnamed, or have a case mismatch.',
+        "Model not found: my_database.public.schema.test_table. It may be missing from models, misnamed, or have a case mismatch.",
       extensions: {
         other: {
-          correlationId: '123',
-          processTime: '1s',
+          correlationId: "123",
+          processTime: "1s",
         },
       },
     });
   });
 
-  it('should handle error when model substitution fails with PARSING_EXCEPTION', async () => {
+  it("should handle error when model substitution fails with PARSING_EXCEPTION", async () => {
     const mockError = {
       response: {
-        data: 'sql.parser.ParsingException: Invalid SQL syntax',
+        data: "sql.parser.ParsingException: Invalid SQL syntax",
         headers: {
-          'x-correlation-id': '123',
-          'x-process-time': '1s',
+          "x-correlation-id": "123",
+          "x-process-time": "1s",
         },
       },
     };
@@ -902,30 +902,30 @@ describe('IbisAdaptor', () => {
     );
 
     await expect(
-      ibisAdaptor.modelSubstitute('SELECT * FROM test_table' as DialectSQL, {
+      ibisAdaptor.modelSubstitute("SELECT * FROM test_table" as DialectSQL, {
         dataSource: DataSourceName.POSTGRES,
         connectionInfo: mockPostgresConnectionInfo,
         mdl: mockManifest,
       }),
     ).rejects.toMatchObject({
       message:
-        'sql.parser.ParsingException: Invalid SQL syntax. Please check your selected column and make sure its quoted for columns with non-alphanumeric characters.',
+        "sql.parser.ParsingException: Invalid SQL syntax. Please check your selected column and make sure its quoted for columns with non-alphanumeric characters.",
       extensions: {
         other: {
-          correlationId: '123',
-          processTime: '1s',
+          correlationId: "123",
+          processTime: "1s",
         },
       },
     });
   });
 
-  it('should handle error when model substitution fails with generic error', async () => {
+  it("should handle error when model substitution fails with generic error", async () => {
     const mockError = {
       response: {
-        data: 'Generic error occurred',
+        data: "Generic error occurred",
         headers: {
-          'x-correlation-id': '123',
-          'x-process-time': '1s',
+          "x-correlation-id": "123",
+          "x-process-time": "1s",
         },
       },
     };
@@ -935,34 +935,34 @@ describe('IbisAdaptor', () => {
     );
 
     await expect(
-      ibisAdaptor.modelSubstitute('SELECT * FROM test_table' as DialectSQL, {
+      ibisAdaptor.modelSubstitute("SELECT * FROM test_table" as DialectSQL, {
         dataSource: DataSourceName.POSTGRES,
         connectionInfo: mockPostgresConnectionInfo,
         mdl: mockManifest,
       }),
     ).rejects.toMatchObject({
-      message: 'Generic error occurred',
+      message: "Generic error occurred",
       extensions: {
         other: {
-          correlationId: '123',
-          processTime: '1s',
+          correlationId: "123",
+          processTime: "1s",
         },
       },
     });
   });
 
-  it('should include catalog and schema in headers when provided', async () => {
-    const mockResponse = { data: 'SELECT * FROM substituted_table' };
+  it("should include catalog and schema in headers when provided", async () => {
+    const mockResponse = { data: "SELECT * FROM substituted_table" };
     mockedAxios.post.mockResolvedValue(mockResponse);
     mockedEncryptor.prototype.decrypt.mockReturnValue(
       JSON.stringify({ password: mockPostgresConnectionInfo.password }),
     );
 
-    const catalog = 'my_catalog';
-    const schema = 'my_schema';
+    const catalog = "my_catalog";
+    const schema = "my_schema";
 
     const result = await ibisAdaptor.modelSubstitute(
-      'SELECT * FROM test_table' as DialectSQL,
+      "SELECT * FROM test_table" as DialectSQL,
       {
         dataSource: DataSourceName.POSTGRES,
         connectionInfo: mockPostgresConnectionInfo,
@@ -972,27 +972,27 @@ describe('IbisAdaptor', () => {
       },
     );
 
-    expect(result).toEqual('SELECT * FROM substituted_table');
+    expect(result).toEqual("SELECT * FROM substituted_table");
     expect(mockedAxios.post).toHaveBeenCalledWith(
       `${ibisServerEndpoint}/v3/connector/postgres/model-substitute`,
       {
-        sql: 'SELECT * FROM test_table',
+        sql: "SELECT * FROM test_table",
         connectionInfo: { connectionUrl: postgresConnectionUrl },
         manifestStr: Buffer.from(JSON.stringify(mockManifest)).toString(
-          'base64',
+          "base64",
         ),
       },
       {
         headers: {
-          'X-User-CATALOG': catalog,
-          'X-User-SCHEMA': schema,
+          "X-User-CATALOG": catalog,
+          "X-User-SCHEMA": schema,
         },
       },
     );
   });
 
-  it('should get version successfully', async () => {
-    const mockVersion = '1.2.3';
+  it("should get version successfully", async () => {
+    const mockVersion = "1.2.3";
     mockedAxios.post.mockResolvedValue({ data: mockVersion });
     mockedEncryptor.prototype.decrypt.mockReturnValue(
       JSON.stringify({ password: mockPostgresConnectionInfo.password }),
@@ -1012,13 +1012,13 @@ describe('IbisAdaptor', () => {
     );
   });
 
-  it('should throw an error when getting version fails', async () => {
+  it("should throw an error when getting version fails", async () => {
     const mockError = {
       response: {
-        data: 'Failed to get version',
+        data: "Failed to get version",
         headers: {
-          'x-correlation-id': '123',
-          'x-process-time': '1s',
+          "x-correlation-id": "123",
+          "x-process-time": "1s",
         },
       },
     };
@@ -1033,18 +1033,18 @@ describe('IbisAdaptor', () => {
         mockPostgresConnectionInfo,
       ),
     ).rejects.toMatchObject({
-      message: 'Failed to get version',
+      message: "Failed to get version",
       extensions: {
         other: {
-          correlationId: '123',
-          processTime: '1s',
+          correlationId: "123",
+          processTime: "1s",
         },
       },
     });
   });
 
-  it('should get version for different data sources', async () => {
-    const mockVersion = '1.2.3';
+  it("should get version for different data sources", async () => {
+    const mockVersion = "1.2.3";
     mockedAxios.post.mockResolvedValue({ data: mockVersion });
 
     // Test BigQuery
@@ -1066,7 +1066,7 @@ describe('IbisAdaptor', () => {
           dataset_id: mockBigQueryConnectionInfo.datasetId,
           credentials: Buffer.from(
             JSON.stringify(mockBigQueryConnectionInfo.credentials),
-          ).toString('base64'),
+          ).toString("base64"),
         },
       },
     );

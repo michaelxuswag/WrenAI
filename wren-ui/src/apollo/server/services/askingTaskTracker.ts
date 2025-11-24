@@ -1,21 +1,21 @@
-import { getLogger } from '@server/utils';
+import { getLogger } from "@server/utils";
 import {
   AskResult,
   AskResultType,
   AskResultStatus,
   AskInput,
-} from '@server/models/adaptor';
+} from "@server/models/adaptor";
 import {
   AskingTask,
   IAskingTaskRepository,
   IThreadResponseRepository,
   IViewRepository,
-} from '@server/repositories';
-import { IWrenAIAdaptor } from '../adaptors';
-import * as Errors from '@server/utils/error';
+} from "@server/repositories";
+import { IWrenAIAdaptor } from "../adaptors";
+import * as Errors from "@server/utils/error";
 
-const logger = getLogger('AskingTaskTracker');
-logger.level = 'debug';
+const logger = getLogger("AskingTaskTracker");
+logger.level = "debug";
 
 interface TrackedTask {
   queryId: string;
@@ -103,7 +103,7 @@ export class AskingTaskTracker implements IAskingTaskTracker {
         (!input.previousTaskId || !input.threadResponseId)
       ) {
         throw new Error(
-          'Previous task id and thread response id are required if rerun from cancelled',
+          "Previous task id and thread response id are required if rerun from cancelled",
         );
       }
 
@@ -342,7 +342,7 @@ export class AskingTaskTracker implements IAskingTaskTracker {
     Promise.allSettled(jobs.map((job) => job())).then((results) => {
       // Log any rejected promises
       results.forEach((result, index) => {
-        if (result.status === 'rejected') {
+        if (result.status === "rejected") {
           logger.error(`Job ${index} failed: ${result.reason}`);
         }
       });
@@ -351,7 +351,7 @@ export class AskingTaskTracker implements IAskingTaskTracker {
       if (tasksToRemove.length > 0) {
         logger.info(
           `Cleaning up tasks that have been in memory too long. Tasks: ${tasksToRemove.join(
-            ', ',
+            ", ",
           )}`,
         );
       }

@@ -1,11 +1,11 @@
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 import {
   Model,
   ModelColumn,
   ModelNestedColumn,
   RelationInfo,
   View,
-} from '@server/repositories';
+} from "@server/repositories";
 import {
   Diagram,
   DiagramModel,
@@ -15,13 +15,13 @@ import {
   IContext,
   RelationType,
   DiagramView,
-} from '@server/types';
-import { ColumnMDL, Manifest } from '@server/mdl/type';
-import { getLogger } from '@server/utils';
-import { MDLBuilder } from '../mdl/mdlBuilder';
+} from "@server/types";
+import { ColumnMDL, Manifest } from "@server/mdl/type";
+import { getLogger } from "@server/utils";
+import { MDLBuilder } from "../mdl/mdlBuilder";
 
-const logger = getLogger('DiagramResolver');
-logger.level = 'debug';
+const logger = getLogger("DiagramResolver");
+logger.level = "debug";
 
 export class DiagramResolver {
   constructor() {

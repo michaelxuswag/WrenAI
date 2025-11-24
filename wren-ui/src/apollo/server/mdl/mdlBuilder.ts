@@ -1,4 +1,4 @@
-import { isEmpty, isNil, pickBy } from 'lodash';
+import { isEmpty, isNil, pickBy } from "lodash";
 import {
   Model,
   ModelColumn,
@@ -6,19 +6,19 @@ import {
   Project,
   RelationInfo,
   View,
-} from '../repositories';
+} from "../repositories";
 import {
   Manifest,
   ModelMDL,
   TableReference,
   WrenEngineDataSourceType,
-} from './type';
-import { getLogger } from '@server/utils';
-import { getConfig } from '@server/config';
-import { DataSourceName } from '../types';
+} from "./type";
+import { getLogger } from "@server/utils";
+import { getConfig } from "@server/config";
+import { DataSourceName } from "../types";
 
-const logger = getLogger('MDLBuilder');
-logger.level = 'debug';
+const logger = getLogger("MDLBuilder");
+logger.level = "debug";
 
 const config = getConfig();
 
@@ -126,7 +126,7 @@ export class MDLBuilder implements IMDLBuilder {
           displayName: model.displayName,
           description: properties.description,
         },
-        primaryKey: '', // will be modified in addColumn
+        primaryKey: "", // will be modified in addColumn
       } as ModelMDL;
     });
   }
@@ -143,7 +143,7 @@ export class MDLBuilder implements IMDLBuilder {
       const viewProperties = pickBy(properties, (value, key) => {
         return (
           !isNil(value) &&
-          ['displayName', 'description', 'question', 'summary'].includes(key)
+          ["displayName", "description", "question", "summary"].includes(key)
         );
       });
 
@@ -164,7 +164,7 @@ export class MDLBuilder implements IMDLBuilder {
   public addNormalField(): void {
     // should addModel first
     if (isEmpty(this.manifest.models)) {
-      logger.debug('No model in manifest, should build model first');
+      logger.debug("No model in manifest, should build model first");
       return;
     }
     this.columns
@@ -201,7 +201,7 @@ export class MDLBuilder implements IMDLBuilder {
           properties.displayName = column.displayName;
         }
         // put nested columns in properties
-        if (column.type.includes('STRUCT')) {
+        if (column.type.includes("STRUCT")) {
           const nestedColumns = this.nestedColumns.filter(
             (nestedColumn) => nestedColumn.columnId === column.id,
           );
@@ -231,7 +231,7 @@ export class MDLBuilder implements IMDLBuilder {
   public addCalculatedField(): void {
     // should addModel first
     if (isEmpty(this.manifest.models)) {
-      logger.debug('No model in manifest, should build model first');
+      logger.debug("No model in manifest, should build model first");
       return;
     }
     this.columns
@@ -386,7 +386,7 @@ export class MDLBuilder implements IMDLBuilder {
       if (column.sourceColumnName !== column.referenceName) {
         return `"${column.sourceColumnName}"`;
       }
-      return '';
+      return "";
     }
     // calculated field
     const lineage = JSON.parse(column.lineage) as number[];
@@ -423,7 +423,7 @@ export class MDLBuilder implements IMDLBuilder {
       },
       [],
     );
-    return `${column.aggregation}(${fieldExpression.join('.')})`;
+    return `${column.aggregation}(${fieldExpression.join(".")})`;
   }
 
   protected getRelationCondition(relation: RelationInfo): string {
@@ -435,7 +435,7 @@ export class MDLBuilder implements IMDLBuilder {
 
   private buildTableReference(model: Model): TableReference | null {
     const modelProps =
-      model.properties && typeof model.properties === 'string'
+      model.properties && typeof model.properties === "string"
         ? JSON.parse(model.properties)
         : {};
     if (!modelProps.table) {
@@ -476,7 +476,7 @@ export class MDLBuilder implements IMDLBuilder {
       // 2. remove expression if it's empty string
       this.manifest.models?.forEach((model) => {
         model.columns?.forEach((column) => {
-          if (column.expression === '') {
+          if (column.expression === "") {
             delete column.expression;
           }
         });

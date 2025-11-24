@@ -1,18 +1,18 @@
-import { ChartStatus } from '@server/models/adaptor';
-import { IWrenAIAdaptor } from '@server/adaptors/wrenAIAdaptor';
+import { ChartStatus } from "@server/models/adaptor";
+import { IWrenAIAdaptor } from "@server/adaptors/wrenAIAdaptor";
 import {
   IThreadResponseRepository,
   ThreadResponse,
-} from '@server/repositories';
-import { getLogger } from '@server/utils/logger';
+} from "@server/repositories";
+import { getLogger } from "@server/utils/logger";
 import {
   PostHogTelemetry,
   TelemetryEvent,
   WrenService,
-} from '@server/telemetry/telemetry';
+} from "@server/telemetry/telemetry";
 
-const logger = getLogger('ChartBackgroundTracker');
-logger.level = 'debug';
+const logger = getLogger("ChartBackgroundTracker");
+logger.level = "debug";
 
 const isFinalized = (status: ChartStatus) => {
   return (
@@ -47,7 +47,7 @@ export class ChartBackgroundTracker {
   }
 
   private start() {
-    logger.info('Chart background tracker started');
+    logger.info("Chart background tracker started");
     setInterval(() => {
       const jobs = Object.values(this.tasks).map(
         (threadResponse) => async () => {
@@ -127,7 +127,7 @@ export class ChartBackgroundTracker {
       Promise.allSettled(jobs.map((job) => job())).then((results) => {
         // show reason of rejection
         results.forEach((result, index) => {
-          if (result.status === 'rejected') {
+          if (result.status === "rejected") {
             logger.error(`Job ${index} failed: ${result.reason}`);
           }
         });
@@ -169,7 +169,7 @@ export class ChartAdjustmentBackgroundTracker {
   }
 
   private start() {
-    logger.info('Chart adjustment background tracker started');
+    logger.info("Chart adjustment background tracker started");
     setInterval(() => {
       const jobs = Object.values(this.tasks).map(
         (threadResponse) => async () => {
@@ -250,7 +250,7 @@ export class ChartAdjustmentBackgroundTracker {
       Promise.allSettled(jobs.map((job) => job())).then((results) => {
         // show reason of rejection
         results.forEach((result, index) => {
-          if (result.status === 'rejected') {
+          if (result.status === "rejected") {
             logger.error(`Job ${index} failed: ${result.reason}`);
           }
         });

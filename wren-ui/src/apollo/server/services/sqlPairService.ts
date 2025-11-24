@@ -1,11 +1,11 @@
-import { SqlPair } from '@server/repositories';
-import { IWrenAIAdaptor } from '@server/adaptors/wrenAIAdaptor';
-import { ISqlPairRepository } from '@server/repositories/sqlPairRepository';
-import { getLogger } from '@server/utils';
-import { chunk } from 'lodash';
-import * as Errors from '@server/utils/error';
-import { Project } from '../repositories';
-import { IIbisAdaptor } from '../adaptors/ibisAdaptor';
+import { SqlPair } from "@server/repositories";
+import { IWrenAIAdaptor } from "@server/adaptors/wrenAIAdaptor";
+import { ISqlPairRepository } from "@server/repositories/sqlPairRepository";
+import { getLogger } from "@server/utils";
+import { chunk } from "lodash";
+import * as Errors from "@server/utils/error";
+import { Project } from "../repositories";
+import { IIbisAdaptor } from "../adaptors/ibisAdaptor";
 import {
   DialectSQL,
   WrenSQL,
@@ -14,11 +14,11 @@ import {
   SqlPairStatus,
   QuestionsResult,
   QuestionsStatus,
-} from '../models/adaptor';
-import { Manifest } from '@server/mdl/type';
-import { DataSourceName } from '@server/types';
+} from "../models/adaptor";
+import { Manifest } from "@server/mdl/type";
+import { DataSourceName } from "@server/types";
 
-const logger = getLogger('SqlPairService');
+const logger = getLogger("SqlPairService");
 
 export interface CreateSqlPair {
   sql: string;
@@ -84,7 +84,7 @@ export class SqlPairService implements ISqlPairService {
     if (dataSource === DataSourceName.DUCKDB) {
       // engine does not implement model substitute.
       throw Errors.create(Errors.GeneralErrorCodes.IBIS_SERVER_ERROR, {
-        customMessage: 'DuckDB data source does not support model substitute.',
+        customMessage: "DuckDB data source does not support model substitute.",
       });
     }
     // use the first model's table reference as default catalog and schema
@@ -195,7 +195,7 @@ export class SqlPairService implements ISqlPairService {
       ).then(async (_result) => {
         if (errorPairs.length > 0) {
           logger.debug(
-            `deploy sql pair failed. ${errorPairs.map((pair) => pair.question).join(', ')}`,
+            `deploy sql pair failed. ${errorPairs.map((pair) => pair.question).join(", ")}`,
           );
           await tx.rollback();
           await this.wrenAIAdaptor.deleteSqlPairs(
@@ -203,7 +203,7 @@ export class SqlPairService implements ISqlPairService {
             successPairs.map((pair) => pair.id),
           );
           throw Errors.create(Errors.GeneralErrorCodes.DEPLOY_SQL_PAIR_ERROR, {
-            customMessage: errorPairs.map((pair) => pair.message).join(', '),
+            customMessage: errorPairs.map((pair) => pair.message).join(", "),
           });
         }
       });

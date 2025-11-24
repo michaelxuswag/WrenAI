@@ -1,10 +1,10 @@
-import { Knex } from 'knex';
-import { BaseRepository, IBasicRepository } from './baseRepository';
+import { Knex } from "knex";
+import { BaseRepository, IBasicRepository } from "./baseRepository";
 
 export enum DashboardCacheRefreshStatus {
-  IN_PROGRESS = 'in_progress',
-  SUCCESS = 'success',
-  FAILED = 'failed',
+  IN_PROGRESS = "in_progress",
+  SUCCESS = "success",
+  FAILED = "failed",
 }
 
 export interface DashboardItemRefreshJob {
@@ -28,6 +28,6 @@ export class DashboardItemRefreshJobRepository
   implements IDashboardItemRefreshJobRepository
 {
   constructor(knexPg: Knex) {
-    super({ knexPg, tableName: 'dashboard_item_refresh_job' });
+    super({ knexPg, tableName: "dashboard_item_refresh_job" });
   }
 }

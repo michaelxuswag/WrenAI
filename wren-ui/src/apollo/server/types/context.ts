@@ -1,9 +1,9 @@
-import { IConfig } from '@server/config';
+import { IConfig } from "@server/config";
 import {
   IIbisAdaptor,
   IWrenAIAdaptor,
   IWrenEngineAdaptor,
-} from '@server/adaptors';
+} from "@server/adaptors";
 import {
   IModelColumnRepository,
   IModelNestedColumnRepository,
@@ -20,7 +20,7 @@ import {
   IInstructionRepository,
   IApiHistoryRepository,
   IDashboardItemRefreshJobRepository,
-} from '@server/repositories';
+} from "@server/repositories";
 import {
   IQueryService,
   IAskingService,
@@ -30,19 +30,37 @@ import {
   IProjectService,
   IDashboardService,
   IInstructionService,
-} from '@server/services';
-import { ITelemetry } from '@server/telemetry/telemetry';
+} from "@server/services";
+import { ITelemetry } from "@server/telemetry/telemetry";
 import {
   ProjectRecommendQuestionBackgroundTracker,
   ThreadRecommendQuestionBackgroundTracker,
   DashboardCacheBackgroundTracker,
-} from '@server/backgrounds';
-import { ISqlPairService } from '../services/sqlPairService';
+} from "@server/backgrounds";
+import { ISqlPairService } from "../services/sqlPairService";
+import { Knex } from "knex";
 
 export interface IContext {
   config: IConfig;
   // telemetry
   telemetry: ITelemetry;
+
+  // Request object (for auth middleware)
+  req?: {
+    headers?: {
+      authorization?: string;
+    };
+  };
+
+  // Database connection
+  knex: Knex;
+
+  // Authentication fields (populated by authMiddleware)
+  userId?: number;
+  email?: string;
+  username?: string;
+  organizationId?: number;
+  isSuperAdmin?: boolean;
 
   // adaptor
   wrenEngineAdaptor: IWrenEngineAdaptor;

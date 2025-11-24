@@ -1,4 +1,4 @@
-import { SampleDatasetTable } from '@server/data';
+import { SampleDatasetTable } from "@server/data";
 import {
   IModelColumnRepository,
   IModelRepository,
@@ -7,32 +7,32 @@ import {
   Model,
   ModelColumn,
   Relation,
-} from '@server/repositories';
+} from "@server/repositories";
 import {
   getLogger,
   safeParseJson,
   replaceAllowableSyntax,
   validateDisplayName,
-} from '@server/utils';
-import { RelationData, UpdateRelationData } from '@server/types';
-import { IProjectService } from './projectService';
+} from "@server/utils";
+import { RelationData, UpdateRelationData } from "@server/types";
+import { IProjectService } from "./projectService";
 import {
   CreateCalculatedFieldData,
   ExpressionName,
   UpdateCalculatedFieldData,
   CheckCalculatedFieldCanQueryData,
-} from '@server/models';
-import { IMDLService } from './mdlService';
-import { IWrenEngineAdaptor } from '../adaptors/wrenEngineAdaptor';
-import { ValidationRules } from '@server/adaptors/ibisAdaptor';
-import { isEmpty, capitalize } from 'lodash';
-import {} from '@server/utils/regex';
-import * as Errors from '@server/utils/error';
-import { DataSourceName } from '@server/types';
-import { IQueryService } from './queryService';
+} from "@server/models";
+import { IMDLService } from "./mdlService";
+import { IWrenEngineAdaptor } from "../adaptors/wrenEngineAdaptor";
+import { ValidationRules } from "@server/adaptors/ibisAdaptor";
+import { isEmpty, capitalize } from "lodash";
+import {} from "@server/utils/regex";
+import * as Errors from "@server/utils/error";
+import { DataSourceName } from "@server/types";
+import { IQueryService } from "./queryService";
 
-const logger = getLogger('ModelService');
-logger.level = 'debug';
+const logger = getLogger("ModelService");
+logger.level = "debug";
 
 export interface ValidateCalculatedFieldResponse {
   valid: boolean;
@@ -117,7 +117,7 @@ export class ModelService implements IModelService {
       id: modelId,
     });
     if (!model) {
-      throw new Error('Model not found');
+      throw new Error("Model not found");
     }
     const { valid, message } = await this.validateCalculatedFieldNaming(
       displayName,
@@ -169,7 +169,7 @@ export class ModelService implements IModelService {
       notNull: false,
       aggregation: expression,
       lineage: JSON.stringify(lineage),
-      properties: JSON.stringify({ description: '' }),
+      properties: JSON.stringify({ description: "" }),
     });
     return column;
   }
@@ -182,7 +182,7 @@ export class ModelService implements IModelService {
     const logTitle = `Update Calculated Field ${id}`;
     const column = await this.modelColumnRepository.findOneBy({ id });
     if (!column) {
-      throw new Error('Column not found');
+      throw new Error("Column not found");
     }
     const model = await this.modelRepository.findOneBy({
       id: column.modelId,
@@ -235,7 +235,7 @@ export class ModelService implements IModelService {
   }
 
   public async updatePrimaryKeys(tables: SampleDatasetTable[]) {
-    logger.debug('start update primary keys');
+    logger.debug("start update primary keys");
     const { id } = await this.projectService.getCurrentProject();
     const models = await this.modelRepository.findAllBy({
       projectId: id,
@@ -254,7 +254,7 @@ export class ModelService implements IModelService {
   }
 
   public async batchUpdateModelProperties(tables: SampleDatasetTable[]) {
-    logger.debug('start batch update model description');
+    logger.debug("start batch update model description");
     const { id } = await this.projectService.getCurrentProject();
     const models = await this.modelRepository.findAllBy({
       projectId: id,
@@ -279,7 +279,7 @@ export class ModelService implements IModelService {
   }
 
   public async batchUpdateColumnProperties(tables: SampleDatasetTable[]) {
-    logger.debug('start batch update column description');
+    logger.debug("start batch update column description");
     const { id } = await this.projectService.getCurrentProject();
     const models = await this.modelRepository.findAllBy({
       projectId: id,
@@ -425,7 +425,7 @@ export class ModelService implements IModelService {
   public async deleteRelation(id: number): Promise<void> {
     const relation = await this.relationRepository.findOneBy({ id });
     if (!relation) {
-      throw new Error('Relation not found');
+      throw new Error("Relation not found");
     }
     const calculatedFields = await this.getCalculatedFieldByRelation(id);
     if (calculatedFields.length > 0) {
@@ -464,7 +464,7 @@ export class ModelService implements IModelService {
     if (!validationRes.valid) {
       return {
         valid: false,
-        message: validationRes.message || 'Invalid Calculated field name',
+        message: validationRes.message || "Invalid Calculated field name",
       };
     }
 
@@ -516,7 +516,7 @@ export class ModelService implements IModelService {
     const fromModel = models.find((m) => m.id === relation.fromModelId);
     const toModel = models.find((m) => m.id === relation.toModelId);
     if (!fromModel || !toModel) {
-      throw new Error('Model not found');
+      throw new Error("Model not found");
     }
 
     const fromColumn = columns.find(
@@ -577,17 +577,17 @@ export class ModelService implements IModelService {
       case ExpressionName.AVG:
       case ExpressionName.LN:
       case ExpressionName.LOG10:
-        type = 'DOUBLE';
+        type = "DOUBLE";
         break;
       case ExpressionName.COUNT:
       case ExpressionName.LENGTH:
-        type = 'BIGINT';
+        type = "BIGINT";
         break;
       case ExpressionName.REVERSE:
-        type = 'VARBINARY';
+        type = "VARBINARY";
         break;
       default:
-        throw new Error('Unsupported expression');
+        throw new Error("Unsupported expression");
     }
     return type;
   }
@@ -595,7 +595,7 @@ export class ModelService implements IModelService {
   private async getFieldDataType(fieldId: number): Promise<string> {
     const field = await this.modelColumnRepository.findOneBy({ id: fieldId });
     if (!field) {
-      throw new Error('Field not found');
+      throw new Error("Field not found");
     }
     return field.type;
   }
@@ -627,7 +627,7 @@ export class ModelService implements IModelService {
       notNull: false,
       aggregation: expression,
       lineage: JSON.stringify(lineage),
-      properties: JSON.stringify({ description: '' }),
+      properties: JSON.stringify({ description: "" }),
     } as ModelColumn;
     mdlBuilder.insertCalculatedField(modelName, modelColumn);
     const manifest = mdlBuilder.getManifest();
@@ -715,7 +715,7 @@ export class ModelService implements IModelService {
     if (existedRelations.length > 0) {
       return {
         valid: false,
-        message: 'This relationship already exists.',
+        message: "This relationship already exists.",
       };
     }
 

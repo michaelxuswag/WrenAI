@@ -1,11 +1,11 @@
-import { Knex } from 'knex';
+import { Knex } from "knex";
 import {
   BaseRepository,
   IBasicRepository,
   IQueryOptions,
-} from './baseRepository';
-import { camelCase, isPlainObject, mapKeys, mapValues } from 'lodash';
-import { AskResultStatus } from '@server/models/adaptor';
+} from "./baseRepository";
+import { camelCase, isPlainObject, mapKeys, mapValues } from "lodash";
+import { AskResultStatus } from "@server/models/adaptor";
 
 export interface DetailStep {
   summary: string;
@@ -40,8 +40,8 @@ export interface ThreadResponseChartDetail {
 }
 
 export enum ThreadResponseAdjustmentType {
-  REASONING = 'REASONING',
-  APPLY_SQL = 'APPLY_SQL',
+  REASONING = "REASONING",
+  APPLY_SQL = "APPLY_SQL",
 }
 
 export type ThreadResponseAdjustmentReasoningPayload = {
@@ -88,24 +88,24 @@ export class ThreadResponseRepository
   implements IThreadResponseRepository
 {
   private readonly jsonbColumns = [
-    'answerDetail',
-    'breakdownDetail',
-    'chartDetail',
-    'adjustment',
+    "answerDetail",
+    "breakdownDetail",
+    "chartDetail",
+    "adjustment",
   ];
 
   constructor(knexPg: Knex) {
-    super({ knexPg, tableName: 'thread_response' });
+    super({ knexPg, tableName: "thread_response" });
   }
 
   public async getResponsesWithThread(threadId: number, limit?: number) {
     const query = this.knex(this.tableName)
-      .select('thread_response.*')
+      .select("thread_response.*")
       .where({ thread_id: threadId })
-      .leftJoin('thread', 'thread.id', 'thread_response.thread_id');
+      .leftJoin("thread", "thread.id", "thread_response.thread_id");
 
     if (limit) {
-      query.orderBy('created_at', 'desc').limit(limit);
+      query.orderBy("created_at", "desc").limit(limit);
     }
 
     return (await query)
@@ -116,19 +116,19 @@ export class ThreadResponseRepository
       .map((res) => {
         // JSON.parse detail and error
         const answerDetail =
-          res.answerDetail && typeof res.answerDetail === 'string'
+          res.answerDetail && typeof res.answerDetail === "string"
             ? JSON.parse(res.answerDetail)
             : res.answerDetail;
         const breakdownDetail =
-          res.breakdownDetail && typeof res.breakdownDetail === 'string'
+          res.breakdownDetail && typeof res.breakdownDetail === "string"
             ? JSON.parse(res.breakdownDetail)
             : res.breakdownDetail;
         const chartDetail =
-          res.chartDetail && typeof res.chartDetail === 'string'
+          res.chartDetail && typeof res.chartDetail === "string"
             ? JSON.parse(res.chartDetail)
             : res.chartDetail;
         const adjustment =
-          res.adjustment && typeof res.adjustment === 'string'
+          res.adjustment && typeof res.adjustment === "string"
             ? JSON.parse(res.adjustment)
             : res.adjustment;
         return {
@@ -173,19 +173,19 @@ export class ThreadResponseRepository
     const [result] = await executer(this.tableName)
       .where({ id })
       .update(this.transformToDBData(transformedData as any))
-      .returning('*');
+      .returning("*");
     return this.transformFromDBData(result);
   }
 
   protected override transformFromDBData = (data: any): ThreadResponse => {
     if (!isPlainObject(data)) {
-      throw new Error('Unexpected dbdata');
+      throw new Error("Unexpected dbdata");
     }
     const camelCaseData = mapKeys(data, (_value, key) => camelCase(key));
     const formattedData = mapValues(camelCaseData, (value, key) => {
       if (this.jsonbColumns.includes(key)) {
         // The value from Sqlite will be string type, while the value from PG is JSON object
-        if (typeof value === 'string') {
+        if (typeof value === "string") {
           return value ? JSON.parse(value) : value;
         } else {
           return value;

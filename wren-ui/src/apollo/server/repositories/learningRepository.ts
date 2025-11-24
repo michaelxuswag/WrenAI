@@ -1,12 +1,12 @@
-import { Knex } from 'knex';
-import { BaseRepository, IBasicRepository } from './baseRepository';
+import { Knex } from "knex";
+import { BaseRepository, IBasicRepository } from "./baseRepository";
 import {
   camelCase,
   isPlainObject,
   mapKeys,
   mapValues,
   snakeCase,
-} from 'lodash';
+} from "lodash";
 
 export interface Learning {
   id: number; // ID
@@ -21,15 +21,15 @@ export class LearningRepository
   implements ILearningRepository
 {
   constructor(knexPg: Knex) {
-    super({ knexPg, tableName: 'learning' });
+    super({ knexPg, tableName: "learning" });
   }
 
   protected override transformToDBData = (data: any) => {
     if (!isPlainObject(data)) {
-      throw new Error('Unexpected dbdata');
+      throw new Error("Unexpected dbdata");
     }
     const transformedData = mapValues(data, (value, key) => {
-      if (['paths'].includes(key)) {
+      if (["paths"].includes(key)) {
         return value ? JSON.stringify(value) : null;
       }
       return value;
@@ -39,13 +39,13 @@ export class LearningRepository
 
   protected override transformFromDBData = (data: any): Learning => {
     if (!isPlainObject(data)) {
-      throw new Error('Unexpected dbdata');
+      throw new Error("Unexpected dbdata");
     }
     const camelCaseData = mapKeys(data, (_value, key) => camelCase(key));
     const formattedData = mapValues(camelCaseData, (value, key) => {
-      if (['paths'].includes(key)) {
+      if (["paths"].includes(key)) {
         // The value from Sqlite will be string type, while the value from PG is JSON object
-        if (typeof value === 'string') {
+        if (typeof value === "string") {
           return value ? JSON.parse(value) : value;
         } else {
           return value;

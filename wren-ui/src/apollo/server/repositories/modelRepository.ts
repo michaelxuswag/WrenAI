@@ -1,9 +1,9 @@
-import { Knex } from 'knex';
+import { Knex } from "knex";
 import {
   BaseRepository,
   IBasicRepository,
   IQueryOptions,
-} from './baseRepository';
+} from "./baseRepository";
 
 export interface Model {
   id: number; // ID
@@ -30,10 +30,10 @@ export class ModelRepository
   implements IModelRepository
 {
   constructor(knexPg: Knex) {
-    super({ knexPg, tableName: 'model' });
+    super({ knexPg, tableName: "model" });
   }
   public async findAllByIds(ids: number[]) {
-    const res = await this.knex<Model>(this.tableName).whereIn('id', ids);
+    const res = await this.knex<Model>(this.tableName).whereIn("id", ids);
     return res.map((r) => this.transformFromDBData(r));
   }
 
@@ -43,7 +43,7 @@ export class ModelRepository
   ) {
     const executer = queryOptions?.tx ? queryOptions.tx : this.knex;
     const builder = executer(this.tableName)
-      .whereIn('source_table_name', sourceTableNames)
+      .whereIn("source_table_name", sourceTableNames)
       .delete();
     return await builder;
   }

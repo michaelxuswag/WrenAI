@@ -8,7 +8,7 @@ import {
   IbisAthenaConnectionInfo,
   IbisRedshiftConnectionType,
   IbisRedshiftConnectionInfo,
-} from './adaptors/ibisAdaptor';
+} from "./adaptors/ibisAdaptor";
 import {
   ATHENA_CONNECTION_INFO,
   BIG_QUERY_CONNECTION_INFO,
@@ -24,10 +24,10 @@ import {
   REDSHIFT_CONNECTION_INFO,
   REDSHIFT_IAM_AUTH,
   REDSHIFT_PASSWORD_AUTH,
-} from './repositories';
-import { DataSourceName } from './types';
-import { getConfig } from './config';
-import { Encryptor } from './utils';
+} from "./repositories";
+import { DataSourceName } from "./types";
+import { getConfig } from "./config";
+import { Encryptor } from "./utils";
 
 const config = getConfig();
 const encryptor = new Encryptor(config);
@@ -73,7 +73,7 @@ interface IDataSourceConnectionInfo<C, I> {
 const dataSource = {
   // Athena
   [DataSourceName.ATHENA]: {
-    sensitiveProps: ['awsSecretKey'],
+    sensitiveProps: ["awsSecretKey"],
     toIbisConnectionInfo(connectionInfo) {
       const decryptedConnectionInfo = decryptConnectionInfo(
         DataSourceName.ATHENA,
@@ -97,7 +97,7 @@ const dataSource = {
 
   // BigQuery
   [DataSourceName.BIG_QUERY]: {
-    sensitiveProps: ['credentials'],
+    sensitiveProps: ["credentials"],
     toIbisConnectionInfo(connectionInfo) {
       const decryptedConnectionInfo = decryptConnectionInfo(
         DataSourceName.BIG_QUERY,
@@ -107,7 +107,7 @@ const dataSource = {
         decryptedConnectionInfo as BIG_QUERY_CONNECTION_INFO;
       const base64Credentials = Buffer.from(
         JSON.stringify(credentials),
-      ).toString('base64');
+      ).toString("base64");
       const res: IbisBigQueryConnectionInfo = {
         project_id: projectId,
         dataset_id: datasetId,
@@ -122,7 +122,7 @@ const dataSource = {
 
   // Postgres
   [DataSourceName.POSTGRES]: {
-    sensitiveProps: ['password'],
+    sensitiveProps: ["password"],
     toIbisConnectionInfo(connectionInfo) {
       const decryptedConnectionInfo = decryptConnectionInfo(
         DataSourceName.POSTGRES,
@@ -135,7 +135,7 @@ const dataSource = {
       const encodedPassword = encodeURIComponent(password);
       let connectionUrl = `postgresql://${user}:${encodedPassword}@${host}:${port}/${database}?`;
       if (ssl) {
-        connectionUrl += 'sslmode=require';
+        connectionUrl += "sslmode=require";
       }
       return {
         connectionUrl,
@@ -148,7 +148,7 @@ const dataSource = {
 
   // mysql
   [DataSourceName.MYSQL]: {
-    sensitiveProps: ['password'],
+    sensitiveProps: ["password"],
     toIbisConnectionInfo(connectionInfo) {
       const decryptedConnectionInfo = decryptConnectionInfo(
         DataSourceName.MYSQL,
@@ -162,7 +162,7 @@ const dataSource = {
         database,
         user,
         password,
-        sslMode: ssl ? 'ENABLED' : 'DISABLED',
+        sslMode: ssl ? "ENABLED" : "DISABLED",
       };
     },
   } as IDataSourceConnectionInfo<
@@ -172,7 +172,7 @@ const dataSource = {
 
   // Oracle
   [DataSourceName.ORACLE]: {
-    sensitiveProps: ['password', 'dsn'],
+    sensitiveProps: ["password", "dsn"],
     toIbisConnectionInfo(connectionInfo) {
       const decryptedConnectionInfo = decryptConnectionInfo(
         DataSourceName.ORACLE,
@@ -188,7 +188,7 @@ const dataSource = {
         password,
         dsn,
       }).reduce((acc, [key, value]) => {
-        if (value !== undefined && value !== '') {
+        if (value !== undefined && value !== "") {
           acc[key] = value;
         }
         return acc;
@@ -201,7 +201,7 @@ const dataSource = {
 
   // SQL Server
   [DataSourceName.MSSQL]: {
-    sensitiveProps: ['password'],
+    sensitiveProps: ["password"],
     toIbisConnectionInfo(connectionInfo) {
       const decryptedConnectionInfo = decryptConnectionInfo(
         DataSourceName.MSSQL,
@@ -217,7 +217,7 @@ const dataSource = {
         user,
         password,
         ...(trustServerCertificate && {
-          kwargs: { trustServerCertificate: 'YES' },
+          kwargs: { trustServerCertificate: "YES" },
         }),
       };
     },
@@ -228,7 +228,7 @@ const dataSource = {
 
   // Click House
   [DataSourceName.CLICK_HOUSE]: {
-    sensitiveProps: ['password'],
+    sensitiveProps: ["password"],
     toIbisConnectionInfo(connectionInfo) {
       const decryptedConnectionInfo = decryptConnectionInfo(
         DataSourceName.CLICK_HOUSE,
@@ -239,7 +239,7 @@ const dataSource = {
       const encodedPassword = encodeURIComponent(password);
       let connectionUrl = `clickhouse://${user}:${encodedPassword}@${host}:${port}/${database}?`;
       if (ssl) {
-        connectionUrl += 'secure=1';
+        connectionUrl += "secure=1";
       }
       return { connectionUrl };
     },
@@ -248,7 +248,7 @@ const dataSource = {
     UrlBasedConnectionInfo
   >,
   [DataSourceName.TRINO]: {
-    sensitiveProps: ['password'],
+    sensitiveProps: ["password"],
     toIbisConnectionInfo(connectionInfo) {
       const { host, password, port, schemas, username, ssl } =
         decryptConnectionInfo(
@@ -256,9 +256,9 @@ const dataSource = {
           connectionInfo,
         ) as TRINO_CONNECTION_INFO;
       // pick first schema from schemas
-      const [catalog, schema] = schemas.split(',')?.[0]?.split('.') ?? [];
+      const [catalog, schema] = schemas.split(",")?.[0]?.split(".") ?? [];
       if (!catalog || !schema) {
-        throw new Error('Invalid schema format, expected catalog.schema');
+        throw new Error("Invalid schema format, expected catalog.schema");
       }
       return {
         host: ssl ? `https://${host}` : `http://${host}`,
@@ -279,7 +279,7 @@ const dataSource = {
       // Helper function to parse and validate schema
       const parseSchema = (schemaStr: string) => {
         const trimmed = schemaStr.trim();
-        const [catalog, schema] = trimmed.split('.');
+        const [catalog, schema] = trimmed.split(".");
         if (!catalog || !schema) {
           throw new Error(
             `Invalid schema format: "${trimmed}". Expected format: catalog.schema`,
@@ -289,10 +289,10 @@ const dataSource = {
       };
 
       // schemas format will be `catalog.schema, catalog.schema, ...`
-      const schemasArray = schemas.split(',').filter(Boolean);
+      const schemasArray = schemas.split(",").filter(Boolean);
       if (schemasArray.length === 0) {
         throw new Error(
-          'No valid schemas provided. Expected format: catalog.schema[, catalog.schema, ...]',
+          "No valid schemas provided. Expected format: catalog.schema[, catalog.schema, ...]",
         );
       }
 
@@ -316,7 +316,7 @@ const dataSource = {
 
   // Snowflake
   [DataSourceName.SNOWFLAKE]: {
-    sensitiveProps: ['password', 'privateKey'],
+    sensitiveProps: ["password", "privateKey"],
     toIbisConnectionInfo(connectionInfo) {
       const decryptedConnectionInfo = decryptConnectionInfo(
         DataSourceName.SNOWFLAKE,
@@ -351,13 +351,13 @@ const dataSource = {
   [DataSourceName.DUCKDB]: {
     sensitiveProps: [],
     toIbisConnectionInfo(_connectionInfo) {
-      throw new Error('Not implemented');
+      throw new Error("Not implemented");
     },
   } as IDataSourceConnectionInfo<DUCKDB_CONNECTION_INFO, unknown>,
 
   // Redshift
   [DataSourceName.REDSHIFT]: {
-    sensitiveProps: ['password', 'awsSecretKey'],
+    sensitiveProps: ["password", "awsSecretKey"],
     toIbisConnectionInfo(connectionInfo) {
       const decryptedConnectionInfo = decryptConnectionInfo(
         DataSourceName.REDSHIFT,
@@ -404,7 +404,7 @@ const dataSource = {
       }
 
       throw new Error(
-        'Invalid Redshift connection info: must use either password or IAM authentication',
+        "Invalid Redshift connection info: must use either password or IAM authentication",
       );
     },
   } as IDataSourceConnectionInfo<

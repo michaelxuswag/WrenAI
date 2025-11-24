@@ -1,4 +1,4 @@
-import { MDLBuilder } from '../mdl/mdlBuilder';
+import { MDLBuilder } from "../mdl/mdlBuilder";
 import {
   IModelNestedColumnRepository,
   IModelColumnRepository,
@@ -6,8 +6,8 @@ import {
   IProjectRepository,
   IRelationRepository,
   IViewRepository,
-} from '../repositories';
-import { Manifest } from '../mdl/type';
+} from "../repositories";
+import { Manifest } from "../mdl/type";
 
 export interface MakeCurrentModelMDLResult {
   manifest: Manifest;

@@ -4,27 +4,27 @@ import {
   mapKeys,
   mapValues,
   snakeCase,
-} from 'lodash';
-import { BaseRepository, IBasicRepository } from './baseRepository';
-import { Knex } from 'knex';
+} from "lodash";
+import { BaseRepository, IBasicRepository } from "./baseRepository";
+import { Knex } from "knex";
 
 export enum ApiType {
-  GENERATE_SQL = 'GENERATE_SQL',
-  RUN_SQL = 'RUN_SQL',
-  GENERATE_VEGA_CHART = 'GENERATE_VEGA_CHART',
-  GENERATE_SUMMARY = 'GENERATE_SUMMARY',
-  ASK = 'ASK',
-  GET_INSTRUCTIONS = 'GET_INSTRUCTIONS',
-  CREATE_INSTRUCTION = 'CREATE_INSTRUCTION',
-  UPDATE_INSTRUCTION = 'UPDATE_INSTRUCTION',
-  DELETE_INSTRUCTION = 'DELETE_INSTRUCTION',
-  GET_SQL_PAIRS = 'GET_SQL_PAIRS',
-  CREATE_SQL_PAIR = 'CREATE_SQL_PAIR',
-  UPDATE_SQL_PAIR = 'UPDATE_SQL_PAIR',
-  DELETE_SQL_PAIR = 'DELETE_SQL_PAIR',
-  GET_MODELS = 'GET_MODELS',
-  STREAM_ASK = 'STREAM_ASK',
-  STREAM_GENERATE_SQL = 'STREAM_GENERATE_SQL',
+  GENERATE_SQL = "GENERATE_SQL",
+  RUN_SQL = "RUN_SQL",
+  GENERATE_VEGA_CHART = "GENERATE_VEGA_CHART",
+  GENERATE_SUMMARY = "GENERATE_SUMMARY",
+  ASK = "ASK",
+  GET_INSTRUCTIONS = "GET_INSTRUCTIONS",
+  CREATE_INSTRUCTION = "CREATE_INSTRUCTION",
+  UPDATE_INSTRUCTION = "UPDATE_INSTRUCTION",
+  DELETE_INSTRUCTION = "DELETE_INSTRUCTION",
+  GET_SQL_PAIRS = "GET_SQL_PAIRS",
+  CREATE_SQL_PAIR = "CREATE_SQL_PAIR",
+  UPDATE_SQL_PAIR = "UPDATE_SQL_PAIR",
+  DELETE_SQL_PAIR = "DELETE_SQL_PAIR",
+  GET_MODELS = "GET_MODELS",
+  STREAM_ASK = "STREAM_ASK",
+  STREAM_GENERATE_SQL = "STREAM_GENERATE_SQL",
 }
 
 export interface ApiHistory {
@@ -44,7 +44,7 @@ export interface ApiHistory {
 export interface PaginationOptions {
   offset: number;
   limit: number;
-  orderBy?: Record<string, 'asc' | 'desc'>;
+  orderBy?: Record<string, "asc" | "desc">;
 }
 
 export interface IApiHistoryRepository extends IBasicRepository<ApiHistory> {
@@ -64,13 +64,13 @@ export class ApiHistoryRepository
   implements IApiHistoryRepository
 {
   private readonly jsonbColumns = [
-    'headers',
-    'requestPayload',
-    'responsePayload',
+    "headers",
+    "requestPayload",
+    "responsePayload",
   ];
 
   constructor(knexPg: Knex) {
-    super({ knexPg, tableName: 'api_history' });
+    super({ knexPg, tableName: "api_history" });
   }
 
   /**
@@ -80,7 +80,7 @@ export class ApiHistoryRepository
     filter?: Partial<ApiHistory>,
     dateFilter?: { startDate?: Date; endDate?: Date },
   ): Promise<number> {
-    let query = this.knex(this.tableName).count('id as count');
+    let query = this.knex(this.tableName).count("id as count");
 
     if (filter) {
       query = query.where(this.transformToDBData(filter));
@@ -88,11 +88,11 @@ export class ApiHistoryRepository
 
     if (dateFilter) {
       if (dateFilter.startDate) {
-        query = query.where('created_at', '>=', dateFilter.startDate);
+        query = query.where("created_at", ">=", dateFilter.startDate);
       }
 
       if (dateFilter.endDate) {
-        query = query.where('created_at', '<=', dateFilter.endDate);
+        query = query.where("created_at", "<=", dateFilter.endDate);
       }
     }
 
@@ -108,7 +108,7 @@ export class ApiHistoryRepository
     dateFilter?: { startDate?: Date; endDate?: Date },
     pagination?: PaginationOptions,
   ): Promise<ApiHistory[]> {
-    let query = this.knex(this.tableName).select('*');
+    let query = this.knex(this.tableName).select("*");
 
     if (filter) {
       query = query.where(this.transformToDBData(filter));
@@ -116,11 +116,11 @@ export class ApiHistoryRepository
 
     if (dateFilter) {
       if (dateFilter.startDate) {
-        query = query.where('created_at', '>=', dateFilter.startDate);
+        query = query.where("created_at", ">=", dateFilter.startDate);
       }
 
       if (dateFilter.endDate) {
-        query = query.where('created_at', '<=', dateFilter.endDate);
+        query = query.where("created_at", "<=", dateFilter.endDate);
       }
     }
 
@@ -131,7 +131,7 @@ export class ApiHistoryRepository
         });
       } else {
         // Default sort by created_at desc
-        query = query.orderBy('created_at', 'desc');
+        query = query.orderBy("created_at", "desc");
       }
 
       query = query.offset(pagination.offset).limit(pagination.limit);
@@ -143,13 +143,13 @@ export class ApiHistoryRepository
 
   protected override transformFromDBData = (data: any): ApiHistory => {
     if (!isPlainObject(data)) {
-      throw new Error('Unexpected dbdata');
+      throw new Error("Unexpected dbdata");
     }
     const camelCaseData = mapKeys(data, (_value, key) => camelCase(key));
     const formattedData = mapValues(camelCaseData, (value, key) => {
       if (this.jsonbColumns.includes(key)) {
         // The value from Sqlite will be string type, while the value from PG is JSON object
-        if (typeof value === 'string') {
+        if (typeof value === "string") {
           if (!value) return value;
           try {
             return JSON.parse(value);
@@ -168,7 +168,7 @@ export class ApiHistoryRepository
 
   protected override transformToDBData = (data: any) => {
     if (!isPlainObject(data)) {
-      throw new Error('Unexpected dbdata');
+      throw new Error("Unexpected dbdata");
     }
     const transformedData = mapValues(data, (value, key) => {
       if (this.jsonbColumns.includes(key)) {

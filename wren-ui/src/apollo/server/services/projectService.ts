@@ -1,39 +1,39 @@
-import crypto from 'crypto';
-import * as fs from 'fs';
-import path from 'path';
-import { getLogger } from '@server/utils';
-import { IProjectRepository, WREN_AI_CONNECTION_INFO } from '../repositories';
-import { Project } from '../repositories';
+import crypto from "crypto";
+import * as fs from "fs";
+import path from "path";
+import { getLogger } from "@server/utils";
+import { IProjectRepository, WREN_AI_CONNECTION_INFO } from "../repositories";
+import { Project } from "../repositories";
 import {
   CompactTable,
   IDataSourceMetadataService,
   RecommendConstraint,
-} from './metadataService';
-import { DataSourceName } from '../types';
+} from "./metadataService";
+import { DataSourceName } from "../types";
 import {
   RecommendationQuestion,
   RecommendationQuestionStatus,
   WrenAIError,
   WrenAILanguage,
-} from '@server/models/adaptor';
-import { encryptConnectionInfo } from '../dataSource';
-import { IWrenAIAdaptor } from '../adaptors';
-import { RecommendQuestionResultStatus } from './askingService';
-import { IMDLService } from './mdlService';
-import { ProjectRecommendQuestionBackgroundTracker } from '../backgrounds';
-import { ITelemetry } from '../telemetry/telemetry';
-import { getConfig } from '../config';
+} from "@server/models/adaptor";
+import { encryptConnectionInfo } from "../dataSource";
+import { IWrenAIAdaptor } from "../adaptors";
+import { RecommendQuestionResultStatus } from "./askingService";
+import { IMDLService } from "./mdlService";
+import { ProjectRecommendQuestionBackgroundTracker } from "../backgrounds";
+import { ITelemetry } from "../telemetry/telemetry";
+import { getConfig } from "../config";
 
 const config = getConfig();
 
-const logger = getLogger('ProjectService');
-logger.level = 'debug';
+const logger = getLogger("ProjectService");
+logger.level = "debug";
 
 const SENSITIVE_PROPERTY_NAME = new Set([
-  'credentials',
-  'password',
-  'awsSecretKey',
-  'privateKey',
+  "credentials",
+  "password",
+  "awsSecretKey",
+  "privateKey",
 ]);
 export interface ProjectData {
   displayName: string;
@@ -214,14 +214,14 @@ export class ProjectService implements IProjectService {
     const projectValue = {
       displayName: projectData.displayName,
       type: projectData.type,
-      catalog: 'wrenai',
-      schema: 'public',
+      catalog: "wrenai",
+      schema: "public",
       connectionInfo: encryptConnectionInfo(
         projectData.type,
         projectData.connectionInfo,
       ),
     };
-    logger.debug('Creating project...');
+    logger.debug("Creating project...");
     const project = await this.projectRepository.createOne(projectValue);
     return project;
   }
@@ -235,9 +235,9 @@ export class ProjectService implements IProjectService {
     // convert credentials from base64 to string and replace all the matched "\n" with "\\n",  there are many \n in the "private_key" property
     const credentialString = JSON.stringify(credentials);
     const fileName = crypto
-      .createHash('md5')
+      .createHash("md5")
       .update(credentialString)
-      .digest('hex');
+      .digest("hex");
 
     const filePath = path.join(persistCredentialDir, `${fileName}.json`);
     // check if file exists

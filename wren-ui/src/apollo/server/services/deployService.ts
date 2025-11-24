@@ -1,21 +1,21 @@
-import { WrenAIDeployStatusEnum } from '@server/models/adaptor';
-import { IWrenAIAdaptor } from '../adaptors/wrenAIAdaptor';
+import { WrenAIDeployStatusEnum } from "@server/models/adaptor";
+import { IWrenAIAdaptor } from "../adaptors/wrenAIAdaptor";
 import {
   Deploy,
   DeployStatusEnum,
   IDeployLogRepository,
-} from '../repositories/deployLogRepository';
-import { Manifest } from '../mdl/type';
-import { createHash } from 'node:crypto';
-import { getLogger } from '@server/utils';
+} from "../repositories/deployLogRepository";
+import { Manifest } from "../mdl/type";
+import { createHash } from "node:crypto";
+import { getLogger } from "@server/utils";
 import {
   PostHogTelemetry,
   TelemetryEvent,
   WrenService,
-} from '../telemetry/telemetry';
+} from "../telemetry/telemetry";
 
-const logger = getLogger('DeployService');
-logger.level = 'debug';
+const logger = getLogger("DeployService");
+logger.level = "debug";
 
 export interface DeployResponse {
   status: DeployStatusEnum;
@@ -141,7 +141,7 @@ export class DeployService implements IDeployService {
   public createMDLHash(manifest: Manifest, projectId: number) {
     const manifestStr = JSON.stringify(manifest);
     const content = `${projectId} ${manifestStr}`;
-    const hash = createHash('sha1').update(content).digest('hex');
+    const hash = createHash("sha1").update(content).digest("hex");
     return hash;
   }
 
@@ -151,7 +151,7 @@ export class DeployService implements IDeployService {
       return null;
     }
     // return base64 encoded manifest
-    return Buffer.from(JSON.stringify(deploy.manifest)).toString('base64');
+    return Buffer.from(JSON.stringify(deploy.manifest)).toString("base64");
   }
 
   public async deleteAllByProjectId(projectId: number): Promise<void> {

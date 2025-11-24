@@ -1,9 +1,9 @@
-import { IContext } from '@server/types/context';
-import { SqlPair } from '@server/repositories';
-import * as Errors from '@server/utils/error';
-import { TelemetryEvent, TrackTelemetry } from '@server/telemetry/telemetry';
-import { DialectSQL, WrenSQL } from '@server/models/adaptor';
-import { safeFormatSQL } from '@server/utils/sqlFormat';
+import { IContext } from "@server/types/context";
+import { SqlPair } from "@server/repositories";
+import * as Errors from "@server/utils/error";
+import { TelemetryEvent, TrackTelemetry } from "@server/telemetry/telemetry";
+import { DialectSQL, WrenSQL } from "@server/models/adaptor";
+import { safeFormatSQL } from "@server/utils/sqlFormat";
 
 export class SqlPairResolver {
   constructor() {
@@ -111,7 +111,7 @@ export class SqlPairResolver {
         manifest,
       },
     );
-    return safeFormatSQL(wrenSQL, { language: 'postgresql' }) as WrenSQL;
+    return safeFormatSQL(wrenSQL, { language: "postgresql" }) as WrenSQL;
   }
 
   private async validateSql(sql: string, ctx: IContext) {

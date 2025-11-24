@@ -1,5 +1,5 @@
-import { NextApiResponse } from 'next';
-import { AskResultStatus } from '@/apollo/server/models/adaptor';
+import { NextApiResponse } from "next";
+import { AskResultStatus } from "@/apollo/server/models/adaptor";
 import {
   EventType,
   StateType,
@@ -8,7 +8,7 @@ import {
   ErrorEvent,
   MessageStartEvent,
   MessageStopEvent,
-} from './sseTypes';
+} from "./sseTypes";
 
 /**
  * Send SSE event to client

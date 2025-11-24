@@ -1,4 +1,4 @@
-import { DashboardItem } from '@server/repositories';
+import { DashboardItem } from "@server/repositories";
 
 export interface PreviewItemResponse {
   data: Record<string, any>[];
@@ -9,20 +9,20 @@ export interface PreviewItemResponse {
 }
 
 export enum ScheduleFrequencyEnum {
-  WEEKLY = 'WEEKLY',
-  DAILY = 'DAILY',
-  CUSTOM = 'CUSTOM',
-  NEVER = 'NEVER',
+  WEEKLY = "WEEKLY",
+  DAILY = "DAILY",
+  CUSTOM = "CUSTOM",
+  NEVER = "NEVER",
 }
 
 export enum CacheScheduleDayEnum {
-  SUN = 'SUN',
-  MON = 'MON',
-  TUE = 'TUE',
-  WED = 'WED',
-  THU = 'THU',
-  FRI = 'FRI',
-  SAT = 'SAT',
+  SUN = "SUN",
+  MON = "MON",
+  TUE = "TUE",
+  WED = "WED",
+  THU = "THU",
+  FRI = "FRI",
+  SAT = "SAT",
 }
 
 export interface DashboardSchedule {

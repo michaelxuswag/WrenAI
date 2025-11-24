@@ -4,14 +4,14 @@
     For PostgreSQL and BigQuery, we will use the Ibis server API.
  */
 
-import { IIbisAdaptor } from '../adaptors/ibisAdaptor';
-import { IWrenEngineAdaptor } from '../adaptors/wrenEngineAdaptor';
-import { Project } from '../repositories';
-import { DataSourceName } from '../types';
-import { getLogger } from '@server/utils';
+import { IIbisAdaptor } from "../adaptors/ibisAdaptor";
+import { IWrenEngineAdaptor } from "../adaptors/wrenEngineAdaptor";
+import { Project } from "../repositories";
+import { DataSourceName } from "../types";
+import { getLogger } from "@server/utils";
 
-const logger = getLogger('MetadataService');
-logger.level = 'debug';
+const logger = getLogger("MetadataService");
+logger.level = "debug";
 
 export interface CompactColumn {
   name: string;
@@ -23,9 +23,9 @@ export interface CompactColumn {
 }
 
 export enum ConstraintType {
-  PRIMARY_KEY = 'PRIMARY KEY',
-  FOREIGN_KEY = 'FOREIGN KEY',
-  UNIQUE = 'UNIQUE',
+  PRIMARY_KEY = "PRIMARY KEY",
+  FOREIGN_KEY = "FOREIGN KEY",
+  UNIQUE = "UNIQUE",
 }
 
 export interface CompactTable {

@@ -1,5 +1,5 @@
-import { Knex } from 'knex';
-import { BaseRepository, IBasicRepository } from './baseRepository';
+import { Knex } from "knex";
+import { BaseRepository, IBasicRepository } from "./baseRepository";
 
 export interface SqlPair {
   id: number; // ID
@@ -17,6 +17,6 @@ export class SqlPairRepository
   implements ISqlPairRepository
 {
   constructor(knexPg: Knex) {
-    super({ knexPg, tableName: 'sql_pair' });
+    super({ knexPg, tableName: "sql_pair" });
   }
 }

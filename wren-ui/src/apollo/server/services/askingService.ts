@@ -1,4 +1,4 @@
-import { IWrenAIAdaptor } from '@server/adaptors/wrenAIAdaptor';
+import { IWrenAIAdaptor } from "@server/adaptors/wrenAIAdaptor";
 import {
   AskResultStatus,
   RecommendationQuestionsResult,
@@ -9,45 +9,45 @@ import {
   ChartStatus,
   ChartAdjustmentOption,
   WrenAILanguage,
-} from '@server/models/adaptor';
-import { IDeployService } from './deployService';
-import { IProjectService } from './projectService';
-import { IThreadRepository, Thread } from '../repositories/threadRepository';
+} from "@server/models/adaptor";
+import { IDeployService } from "./deployService";
+import { IProjectService } from "./projectService";
+import { IThreadRepository, Thread } from "../repositories/threadRepository";
 import {
   IThreadResponseRepository,
   ThreadResponse,
   ThreadResponseAdjustmentType,
-} from '../repositories/threadResponseRepository';
-import { getLogger } from '@server/utils';
-import { isEmpty, isNil } from 'lodash';
-import { safeFormatSQL } from '@server/utils/sqlFormat';
+} from "../repositories/threadResponseRepository";
+import { getLogger } from "@server/utils";
+import { isEmpty, isNil } from "lodash";
+import { safeFormatSQL } from "@server/utils/sqlFormat";
 import {
   PostHogTelemetry,
   TelemetryEvent,
   WrenService,
-} from '../telemetry/telemetry';
+} from "../telemetry/telemetry";
 import {
   IAskingTaskRepository,
   IViewRepository,
   Project,
-} from '../repositories';
-import { IQueryService, PreviewDataResponse } from './queryService';
-import { IMDLService } from './mdlService';
+} from "../repositories";
+import { IQueryService, PreviewDataResponse } from "./queryService";
+import { IMDLService } from "./mdlService";
 import {
   ThreadRecommendQuestionBackgroundTracker,
   ChartBackgroundTracker,
   ChartAdjustmentBackgroundTracker,
   AdjustmentBackgroundTaskTracker,
   TrackedAdjustmentResult,
-} from '../backgrounds';
-import { getConfig } from '@server/config';
-import { TextBasedAnswerBackgroundTracker } from '../backgrounds/textBasedAnswerBackgroundTracker';
-import { IAskingTaskTracker, TrackedAskingResult } from './askingTaskTracker';
+} from "../backgrounds";
+import { getConfig } from "@server/config";
+import { TextBasedAnswerBackgroundTracker } from "../backgrounds/textBasedAnswerBackgroundTracker";
+import { IAskingTaskTracker, TrackedAskingResult } from "./askingTaskTracker";
 
 const config = getConfig();
 
-const logger = getLogger('AskingService');
-logger.level = 'debug';
+const logger = getLogger("AskingService");
+logger.level = "debug";
 
 // const QUERY_ID_PLACEHOLDER = '0';
 
@@ -75,10 +75,10 @@ export interface AskingDetailTaskUpdateInput {
 }
 
 export enum RecommendQuestionResultStatus {
-  NOT_STARTED = 'NOT_STARTED',
-  GENERATING = 'GENERATING',
-  FINISHED = 'FINISHED',
-  FAILED = 'FAILED',
+  NOT_STARTED = "NOT_STARTED",
+  GENERATING = "GENERATING",
+  FINISHED = "FINISHED",
+  FAILED = "FAILED",
 }
 
 export interface ThreadRecommendQuestionResult {
@@ -92,13 +92,13 @@ export interface InstantRecommendedQuestionsInput {
 }
 
 export enum ThreadResponseAnswerStatus {
-  NOT_STARTED = 'NOT_STARTED',
-  FETCHING_DATA = 'FETCHING_DATA',
-  PREPROCESSING = 'PREPROCESSING',
-  STREAMING = 'STREAMING',
-  FINISHED = 'FINISHED',
-  FAILED = 'FAILED',
-  INTERRUPTED = 'INTERRUPTED',
+  NOT_STARTED = "NOT_STARTED",
+  FETCHING_DATA = "FETCHING_DATA",
+  PREPROCESSING = "PREPROCESSING",
+  STREAMING = "STREAMING",
+  FINISHED = "FINISHED",
+  FAILED = "FAILED",
+  INTERRUPTED = "INTERRUPTED",
 }
 
 // adjustment input
@@ -253,7 +253,7 @@ export const constructCteSql = (
     return `-- ${slicedSteps[0].summary}\n${slicedSteps[0].sql}`;
   }
 
-  let sql = 'WITH ';
+  let sql = "WITH ";
   slicedSteps.forEach((step, index) => {
     if (index === slicedSteps.length - 1) {
       // if it's the last step, remove the trailing comma.
@@ -306,7 +306,7 @@ class BreakdownBackgroundTracker {
   }
 
   public start() {
-    logger.info('Background tracker started');
+    logger.info("Background tracker started");
     setInterval(() => {
       const jobs = Object.values(this.tasks).map(
         (threadResponse) => async () => {
@@ -381,7 +381,7 @@ class BreakdownBackgroundTracker {
       Promise.allSettled(jobs.map((job) => job())).then((results) => {
         // show reason of rejection
         results.forEach((result, index) => {
-          if (result.status === 'rejected') {
+          if (result.status === "rejected") {
             logger.error(`Job ${index} failed: ${result.reason}`);
           }
         });
@@ -717,7 +717,7 @@ export class AskingService implements IAskingService {
   ): Promise<Thread> {
     // if input is empty, throw error
     if (isEmpty(input)) {
-      throw new Error('Update thread input is empty');
+      throw new Error("Update thread input is empty");
     }
 
     return this.threadRepository.updateOne(threadId, {

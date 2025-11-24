@@ -1,11 +1,11 @@
-import { camelCase, differenceWith, isEmpty, isEqual, uniqBy } from 'lodash';
-import { IContext } from '@server/types';
-import { getLogger } from 'log4js';
-import { SchemaChange } from '@server/repositories/schemaChangeRepository';
-import { Model, ModelColumn, RelationInfo } from '../repositories';
+import { camelCase, differenceWith, isEmpty, isEqual, uniqBy } from "lodash";
+import { IContext } from "@server/types";
+import { getLogger } from "log4js";
+import { SchemaChange } from "@server/repositories/schemaChangeRepository";
+import { Model, ModelColumn, RelationInfo } from "../repositories";
 
-const logger = getLogger('DataSourceSchemaDetector');
-logger.level = 'debug';
+const logger = getLogger("DataSourceSchemaDetector");
+logger.level = "debug";
 
 export type DataSourceSchema = {
   name: string;
@@ -29,11 +29,11 @@ export type DataSourceSchemaResolve = {
 
 export enum SchemaChangeType {
   // the tables has been deleted
-  DELETED_TABLES = 'deletedTables',
+  DELETED_TABLES = "deletedTables",
   // the columns has been deleted
-  DELETED_COLUMNS = 'deletedColumns',
+  DELETED_COLUMNS = "deletedColumns",
   // the columns type has been changed
-  MODIFIED_COLUMNS = 'modifiedColumns',
+  MODIFIED_COLUMNS = "modifiedColumns",
 }
 
 interface AffectedResources {
@@ -115,7 +115,7 @@ export default class DataSourceSchemaDetector
       SchemaChangeType.DELETED_COLUMNS,
     ];
     if (!supportedTypes.includes(schemaChangeType)) {
-      throw new Error('Resolved scheme change type is not supported.');
+      throw new Error("Resolved scheme change type is not supported.");
     }
 
     const lastSchemaChange =
@@ -321,7 +321,7 @@ export default class DataSourceSchemaDetector
       );
 
       // unique calculated fields by id since it can be duplicated
-      const calculatedFields = uniqBy(affectedMaterials.calculatedFields, 'id');
+      const calculatedFields = uniqBy(affectedMaterials.calculatedFields, "id");
 
       return {
         sourceTableName: model.sourceTableName,
@@ -337,7 +337,7 @@ export default class DataSourceSchemaDetector
   }
 
   private async getDiffSchema() {
-    logger.info('Start to detect Data Source Schema changes.');
+    logger.info("Start to detect Data Source Schema changes.");
     const currentSchema = await this.getCurrentSchema();
     const latestSchema = await this.getLatestSchema();
 
@@ -397,12 +397,12 @@ export default class DataSourceSchemaDetector
     }, {});
 
     if (!isEmpty(diffSchema)) {
-      logger.debug('Diff Schema:', JSON.stringify(diffSchema));
-      logger.info('Data Source Schema has changed.');
+      logger.debug("Diff Schema:", JSON.stringify(diffSchema));
+      logger.info("Data Source Schema has changed.");
       return diffSchema as DataSourceSchemaChange;
     }
 
-    logger.info('No changes in Data Source Schema.');
+    logger.info("No changes in Data Source Schema.");
     return null;
   }
 

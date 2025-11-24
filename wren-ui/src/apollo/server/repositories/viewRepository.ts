@@ -1,5 +1,5 @@
-import { Knex } from 'knex';
-import { BaseRepository, IBasicRepository } from './baseRepository';
+import { Knex } from "knex";
+import { BaseRepository, IBasicRepository } from "./baseRepository";
 
 export interface View {
   id: number; // ID
@@ -18,6 +18,6 @@ export class ViewRepository
   implements IViewRepository
 {
   constructor(knexPg: Knex) {
-    super({ knexPg, tableName: 'view' });
+    super({ knexPg, tableName: "view" });
   }
 }

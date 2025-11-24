@@ -1,6 +1,6 @@
-import { Knex } from 'knex';
-import { BaseRepository, IBasicRepository } from './baseRepository';
-import { ScheduleFrequencyEnum } from '@server/models/dashboard';
+import { Knex } from "knex";
+import { BaseRepository, IBasicRepository } from "./baseRepository";
+import { ScheduleFrequencyEnum } from "@server/models/dashboard";
 
 export interface Dashboard {
   id: number;
@@ -20,6 +20,6 @@ export class DashboardRepository
   implements IDashboardRepository
 {
   constructor(knexPg: Knex) {
-    super({ knexPg, tableName: 'dashboard' });
+    super({ knexPg, tableName: "dashboard" });
   }
 }

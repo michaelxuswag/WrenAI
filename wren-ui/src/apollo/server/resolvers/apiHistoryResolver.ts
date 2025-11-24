@@ -1,5 +1,5 @@
-import { ApiType, ApiHistory } from '@server/repositories/apiHistoryRepository';
-import { IContext } from '@server/types';
+import { ApiType, ApiHistory } from "@server/repositories/apiHistoryRepository";
+import { IContext } from "@server/types";
 
 export interface ApiHistoryFilter {
   apiType?: ApiType;
@@ -120,7 +120,7 @@ export class ApiHistoryResolver {
       {
         offset,
         limit,
-        orderBy: { createdAt: 'desc' },
+        orderBy: { createdAt: "desc" },
       },
     );
 

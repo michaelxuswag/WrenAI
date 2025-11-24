@@ -1,4 +1,4 @@
-import crypto from 'crypto';
+import crypto from "crypto";
 
 export interface encryptOptions {
   password: string;
@@ -14,8 +14,8 @@ export class Encryptor {
   private readonly ENCRYPTION_SALT: string;
   private ENCRYPTION_ITERATION = 1000;
   private ENCRYPTION_KEY_LENGTH = 256 / 8; // in bytes
-  private ENCRYPTION_ALGORITHM = 'aes-256-cbc';
-  private ENCRYPTION_SEPARATOR = ':';
+  private ENCRYPTION_ALGORITHM = "aes-256-cbc";
+  private ENCRYPTION_SEPARATOR = ":";
 
   constructor({
     encryptionPassword,
@@ -34,13 +34,13 @@ export class Encryptor {
     const iv = crypto.randomBytes(16); // AES block size
     const cipher = crypto.createCipheriv(this.ENCRYPTION_ALGORITHM, key, iv);
     const encrypted = Buffer.concat([
-      cipher.update(credentialsString, 'utf8'),
+      cipher.update(credentialsString, "utf8"),
       cipher.final(),
     ]);
     return (
-      iv.toString('base64') +
+      iv.toString("base64") +
       this.ENCRYPTION_SEPARATOR +
-      encrypted.toString('base64')
+      encrypted.toString("base64")
     );
   }
 
@@ -48,8 +48,8 @@ export class Encryptor {
     const [ivBase64, encryptedBase64] = encryptedText.split(
       this.ENCRYPTION_SEPARATOR,
     );
-    const iv = Buffer.from(ivBase64, 'base64');
-    const encrypted = Buffer.from(encryptedBase64, 'base64');
+    const iv = Buffer.from(ivBase64, "base64");
+    const encrypted = Buffer.from(encryptedBase64, "base64");
     const key = this.createSecretKey();
     const decipher = crypto.createDecipheriv(
       this.ENCRYPTION_ALGORITHM,
@@ -60,7 +60,7 @@ export class Encryptor {
       decipher.update(encrypted),
       decipher.final(),
     ]);
-    return decrypted.toString('utf8');
+    return decrypted.toString("utf8");
   }
 
   private createSecretKey() {
@@ -69,7 +69,7 @@ export class Encryptor {
       this.ENCRYPTION_SALT,
       this.ENCRYPTION_ITERATION,
       this.ENCRYPTION_KEY_LENGTH,
-      'sha512',
+      "sha512",
     );
   }
 }

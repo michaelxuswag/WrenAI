@@ -1,11 +1,11 @@
-import axios, { AxiosResponse } from 'axios';
-import { Manifest } from '../mdl/type';
-import { getLogger } from '@server/utils';
-import * as Errors from '@server/utils/error';
-import { CompactTable, DEFAULT_PREVIEW_LIMIT } from '../services';
+import axios, { AxiosResponse } from "axios";
+import { Manifest } from "../mdl/type";
+import { getLogger } from "@server/utils";
+import * as Errors from "@server/utils/error";
+import { CompactTable, DEFAULT_PREVIEW_LIMIT } from "../services";
 
-const logger = getLogger('WrenEngineAdaptor');
-logger.level = 'debug';
+const logger = getLogger("WrenEngineAdaptor");
+logger.level = "debug";
 
 export interface WrenEngineDeployStatusResponse {
   systemStatus: string;
@@ -27,11 +27,11 @@ export interface DescribeStatementResponse {
 }
 
 export enum WrenEngineValidateStatus {
-  PASS = 'PASS',
-  ERROR = 'ERROR',
-  FAIL = 'FAIL',
-  WARN = 'WARN',
-  SKIP = 'SKIP',
+  PASS = "PASS",
+  ERROR = "ERROR",
+  FAIL = "FAIL",
+  WARN = "WARN",
+  SKIP = "SKIP",
 }
 
 export interface WrenEngineValidateResponse {
@@ -98,13 +98,13 @@ export interface IWrenEngineAdaptor {
 
 export class WrenEngineAdaptor implements IWrenEngineAdaptor {
   private readonly wrenEngineBaseEndpoint: string;
-  private sessionPropsUrlPath = '/v1/data-source/duckdb/settings/session-sql';
-  private queryDuckdbUrlPath = '/v1/data-source/duckdb/query';
-  private initSqlUrlPath = '/v1/data-source/duckdb/settings/init-sql';
-  private previewUrlPath = '/v1/mdl/preview';
-  private dryPlanUrlPath = '/v1/mdl/dry-plan';
-  private dryRunUrlPath = '/v1/mdl/dry-run';
-  private validateUrlPath = '/v1/mdl/validate';
+  private sessionPropsUrlPath = "/v1/data-source/duckdb/settings/session-sql";
+  private queryDuckdbUrlPath = "/v1/data-source/duckdb/query";
+  private initSqlUrlPath = "/v1/data-source/duckdb/settings/init-sql";
+  private previewUrlPath = "/v1/mdl/preview";
+  private dryPlanUrlPath = "/v1/mdl/dry-plan";
+  private dryRunUrlPath = "/v1/mdl/dry-run";
+  private validateUrlPath = "/v1/mdl/validate";
 
   constructor({ wrenEngineEndpoint }: { wrenEngineEndpoint: string }) {
     this.wrenEngineBaseEndpoint = wrenEngineEndpoint;
@@ -158,9 +158,9 @@ export class WrenEngineAdaptor implements IWrenEngineAdaptor {
 
   public async listTables() {
     const sql =
-      'SELECT \
+      "SELECT \
       table_catalog, table_schema, table_name, column_name, ordinal_position, is_nullable, data_type\
-      FROM INFORMATION_SCHEMA.COLUMNS;';
+      FROM INFORMATION_SCHEMA.COLUMNS;";
     const response = await this.queryDuckdb(sql);
     return this.formatToCompactTable(response);
   }
@@ -170,14 +170,14 @@ export class WrenEngineAdaptor implements IWrenEngineAdaptor {
       .map(([key, value]) => {
         return `SET ${key} = '${value}';`;
       })
-      .join('\n');
+      .join("\n");
     try {
       const url = new URL(
         this.sessionPropsUrlPath,
         this.wrenEngineBaseEndpoint,
       );
       const headers = {
-        'Content-Type': 'text/plain; charset=utf-8',
+        "Content-Type": "text/plain; charset=utf-8",
       };
       await axios.put(url.href, setSessionStatements, { headers });
     } catch (err: any) {
@@ -194,7 +194,7 @@ export class WrenEngineAdaptor implements IWrenEngineAdaptor {
     try {
       const url = new URL(this.queryDuckdbUrlPath, this.wrenEngineBaseEndpoint);
       const headers = {
-        'Content-Type': 'text/plain; charset=utf-8',
+        "Content-Type": "text/plain; charset=utf-8",
       };
       const res = await axios.post(url.href, sql, { headers });
       return res.data as EngineQueryResponse;
@@ -215,9 +215,9 @@ export class WrenEngineAdaptor implements IWrenEngineAdaptor {
           value,
         };
       });
-      const url = new URL('/v1/config', this.wrenEngineBaseEndpoint);
+      const url = new URL("/v1/config", this.wrenEngineBaseEndpoint);
       const headers = {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       };
       await axios.patch(url.href, configPayload, { headers });
     } catch (err: any) {
@@ -237,11 +237,11 @@ export class WrenEngineAdaptor implements IWrenEngineAdaptor {
     try {
       const url = new URL(this.previewUrlPath, this.wrenEngineBaseEndpoint);
       const headers = {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       };
 
       const res: AxiosResponse<EngineQueryResponse> = await axios({
-        method: 'get',
+        method: "get",
         url: url.href,
         headers,
         data: {
@@ -272,10 +272,10 @@ export class WrenEngineAdaptor implements IWrenEngineAdaptor {
       };
 
       const url = new URL(this.dryPlanUrlPath, this.wrenEngineBaseEndpoint);
-      const headers = { 'Content-Type': 'application/json' };
+      const headers = { "Content-Type": "application/json" };
 
       const res: AxiosResponse<string> = await axios({
-        method: 'get',
+        method: "get",
         url: url.href,
         headers,
         data: {
@@ -309,7 +309,7 @@ export class WrenEngineAdaptor implements IWrenEngineAdaptor {
       );
       const url = new URL(this.dryRunUrlPath, this.wrenEngineBaseEndpoint);
       const res: AxiosResponse<WrenEngineDryRunResponse[]> = await axios({
-        method: 'get',
+        method: "get",
         url: url.href,
         data: body,
       });
@@ -342,7 +342,7 @@ export class WrenEngineAdaptor implements IWrenEngineAdaptor {
     try {
       const url = new URL(this.initSqlUrlPath, this.wrenEngineBaseEndpoint);
       const headers = {
-        'Content-Type': 'text/plain; charset=utf-8',
+        "Content-Type": "text/plain; charset=utf-8",
       };
       await axios.put(url.href, sql, { headers });
     } catch (err: any) {
@@ -372,7 +372,7 @@ export class WrenEngineAdaptor implements IWrenEngineAdaptor {
       if (!table) {
         table = {
           name: table_name,
-          description: '',
+          description: "",
           columns: [],
           properties: {
             schema: table_schema,
@@ -386,8 +386,8 @@ export class WrenEngineAdaptor implements IWrenEngineAdaptor {
       table.columns.push({
         name: column_name,
         type: data_type,
-        notNull: is_nullable.toLocaleLowerCase() !== 'yes',
-        description: '',
+        notNull: is_nullable.toLocaleLowerCase() !== "yes",
+        description: "",
         properties: {},
       });
       return acc;

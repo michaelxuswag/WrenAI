@@ -6,26 +6,26 @@ import {
   DashboardItemType,
   DashboardItemDetail,
   DashboardItemLayout,
-} from '@server/repositories';
-import { getLogger } from '@server/utils';
-import { getUTCOffsetMinutes } from '@server/utils/timezone';
-import { IProjectService } from './projectService';
+} from "@server/repositories";
+import { getLogger } from "@server/utils";
+import { getUTCOffsetMinutes } from "@server/utils/timezone";
+import { IProjectService } from "./projectService";
 import {
   SetDashboardCacheData,
   ScheduleFrequencyEnum,
   CacheScheduleDayEnum,
   DashboardSchedule,
   DAYS,
-} from '@server/models/dashboard';
-import { CronExpressionParser } from 'cron-parser';
-const logger = getLogger('DashboardService');
-logger.level = 'debug';
+} from "@server/models/dashboard";
+import { CronExpressionParser } from "cron-parser";
+const logger = getLogger("DashboardService");
+logger.level = "debug";
 
 export interface CreateDashboardItemInput {
   dashboardId: number;
   type: DashboardItemType;
   sql: string;
-  chartSchema: DashboardItemDetail['chartSchema'];
+  chartSchema: DashboardItemDetail["chartSchema"];
 }
 
 export interface UpdateDashboardItemInput {
@@ -133,7 +133,7 @@ export class DashboardService implements IDashboardService {
     if (existingDashboard) return existingDashboard;
     // only support one dashboard for oss
     return await this.dashboardRepository.createOne({
-      name: 'Dashboard',
+      name: "Dashboard",
       projectId: project.id,
     });
   }
@@ -153,7 +153,7 @@ export class DashboardService implements IDashboardService {
       id: dashboardItemId,
     });
     if (!item) {
-      throw new Error('Dashboard item not found.');
+      throw new Error("Dashboard item not found.");
     }
     return item;
   }
@@ -203,7 +203,7 @@ export class DashboardService implements IDashboardService {
         layout.h > 0,
     );
     if (!isValidLayouts) {
-      throw new Error('Invalid layouts boundaries.');
+      throw new Error("Invalid layouts boundaries.");
     }
     await Promise.all(
       layouts.map(async (layout) => {
@@ -421,24 +421,24 @@ export class DashboardService implements IDashboardService {
       return;
     }
     if (schedule.frequency === ScheduleFrequencyEnum.WEEKLY && !schedule.day) {
-      throw new Error('Day of week is required for weekly schedule');
+      throw new Error("Day of week is required for weekly schedule");
     }
 
     if (schedule.frequency === ScheduleFrequencyEnum.CUSTOM && !schedule.cron) {
-      throw new Error('Cron expression is required for custom schedule');
+      throw new Error("Cron expression is required for custom schedule");
     }
 
     if (schedule.hour < 0 || schedule.hour > 23) {
-      throw new Error('Hour must be between 0 and 23');
+      throw new Error("Hour must be between 0 and 23");
     }
 
     if (schedule.minute < 0 || schedule.minute > 59) {
-      throw new Error('Minute must be between 0 and 59');
+      throw new Error("Minute must be between 0 and 59");
     }
 
     if (schedule.timezone) {
       try {
-        new Date().toLocaleString('en-US', { timeZone: schedule.timezone });
+        new Date().toLocaleString("en-US", { timeZone: schedule.timezone });
       } catch (_) {
         throw new Error(`Invalid timezone: ${schedule.timezone}`);
       }
@@ -446,7 +446,7 @@ export class DashboardService implements IDashboardService {
 
     if (schedule.frequency === ScheduleFrequencyEnum.CUSTOM) {
       // can not less than 10 minutes, skip if is local
-      if (process.env.NODE_ENV === 'development') return;
+      if (process.env.NODE_ENV === "development") return;
       const baseInterval = CronExpressionParser.parse(schedule.cron, {
         currentDate: new Date(),
       });
@@ -459,7 +459,7 @@ export class DashboardService implements IDashboardService {
       const diff = nextDate.getTime() - baseDate.getTime();
       if (diff < 10 * 60 * 1000) {
         throw new Error(
-          'Custom cron expression must be at least 10 minutes apart',
+          "Custom cron expression must be at least 10 minutes apart",
         );
       }
     }
@@ -472,8 +472,8 @@ export class DashboardService implements IDashboardService {
         hour: 0,
         minute: 0,
         day: null,
-        timezone: dashboard.scheduleTimezone || '',
-        cron: '',
+        timezone: dashboard.scheduleTimezone || "",
+        cron: "",
       } as DashboardSchedule;
     }
     switch (dashboard.scheduleFrequency) {
@@ -483,14 +483,14 @@ export class DashboardService implements IDashboardService {
           hour: 0,
           minute: 0,
           day: null,
-          timezone: dashboard.scheduleTimezone || '',
+          timezone: dashboard.scheduleTimezone || "",
           cron: dashboard.scheduleCron,
         };
       case ScheduleFrequencyEnum.DAILY:
       case ScheduleFrequencyEnum.WEEKLY: {
-        const parts = dashboard.scheduleCron.split(' ');
+        const parts = dashboard.scheduleCron.split(" ");
         if (parts.length !== 5) {
-          throw new Error('Invalid cron expression format');
+          throw new Error("Invalid cron expression format");
         }
         const [minute, hour, , , dayOfWeek] = parts;
         return this.toTimezone({
@@ -501,7 +501,7 @@ export class DashboardService implements IDashboardService {
             dashboard.scheduleFrequency === ScheduleFrequencyEnum.WEEKLY
               ? (dayOfWeek as CacheScheduleDayEnum)
               : null,
-          timezone: dashboard.scheduleTimezone || '',
+          timezone: dashboard.scheduleTimezone || "",
           cron: null,
         } as DashboardSchedule);
       }
@@ -511,12 +511,12 @@ export class DashboardService implements IDashboardService {
           hour: null,
           minute: null,
           day: null,
-          timezone: dashboard.scheduleTimezone || '',
+          timezone: dashboard.scheduleTimezone || "",
           cron: null,
         } as DashboardSchedule;
       }
       default: {
-        throw new Error('Invalid schedule frequency');
+        throw new Error("Invalid schedule frequency");
       }
     }
   }

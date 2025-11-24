@@ -1,4 +1,4 @@
-import { ColumnMetadata } from '@server/services/queryService';
+import { ColumnMetadata } from "@server/services/queryService";
 
 /**
  * Transform raw data (columns + rows) into an array of objects
@@ -17,7 +17,7 @@ export const transformToObjects = (
   // throw an error if the number of columns in the rows does not match the number of columns in the columns array
   if (rows[0].length !== columns.length) {
     throw new Error(
-      'Number of columns in the rows does not match the number of columns in the columns array',
+      "Number of columns in the rows does not match the number of columns in the columns array",
     );
   }
 

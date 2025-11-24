@@ -1,5 +1,5 @@
-import axios from 'axios';
-import { Readable } from 'stream';
+import axios from "axios";
+import { Readable } from "stream";
 import {
   AskCandidateType,
   AskDetailInput,
@@ -33,14 +33,14 @@ import {
   AskFeedbackInput,
   AskFeedbackResult,
   AskFeedbackStatus,
-} from '@server/models/adaptor';
-import { getLogger } from '@server/utils';
-import * as Errors from '@server/utils/error';
-import { SqlPair } from '../repositories';
-import { ThreadResponse } from '@server/repositories';
+} from "@server/models/adaptor";
+import { getLogger } from "@server/utils";
+import * as Errors from "@server/utils/error";
+import { SqlPair } from "../repositories";
+import { ThreadResponse } from "@server/repositories";
 
-const logger = getLogger('WrenAIAdaptor');
-logger.level = 'debug';
+const logger = getLogger("WrenAIAdaptor");
+logger.level = "debug";
 
 const getAIServiceError = (error: any) => {
   const { data } = error.response || {};
@@ -141,7 +141,7 @@ export class WrenAIAdaptor implements IWrenAIAdaptor {
   public async delete(projectId: number): Promise<void> {
     try {
       if (!projectId) {
-        throw new Error('Project ID is required');
+        throw new Error("Project ID is required");
       }
       const url = `${this.wrenAIBaseEndpoint}/v1/semantics`;
       const response = await axios.delete(url, {
@@ -251,7 +251,7 @@ export class WrenAIAdaptor implements IWrenAIAdaptor {
     // make PATCH request /v1/asks/:query_id to cancel the query
     try {
       await axios.patch(`${this.wrenAIBaseEndpoint}/v1/asks/${queryId}`, {
-        status: 'stopped',
+        status: "stopped",
       });
     } catch (err: any) {
       logger.debug(`Got error when canceling ask: ${getAIServiceError(err)}`);
@@ -282,7 +282,7 @@ export class WrenAIAdaptor implements IWrenAIAdaptor {
     try {
       const res = await axios.get(
         `${this.wrenAIBaseEndpoint}/v1/asks/${queryId}/streaming-result`,
-        { responseType: 'stream' },
+        { responseType: "stream" },
       );
       return res.data;
     } catch (err: any) {
@@ -459,7 +459,7 @@ export class WrenAIAdaptor implements IWrenAIAdaptor {
     try {
       const res = await axios.get(
         `${this.wrenAIBaseEndpoint}/v1/sql-answers/${queryId}/streaming`,
-        { responseType: 'stream' },
+        { responseType: "stream" },
       );
       return res.data;
     } catch (err: any) {
@@ -500,7 +500,7 @@ export class WrenAIAdaptor implements IWrenAIAdaptor {
   public async cancelChart(queryId: string): Promise<void> {
     try {
       await axios.patch(`${this.wrenAIBaseEndpoint}/v1/charts/${queryId}`, {
-        status: 'stopped',
+        status: "stopped",
       });
     } catch (err: any) {
       logger.debug(`Got error when canceling chart: ${getAIServiceError(err)}`);
@@ -542,7 +542,7 @@ export class WrenAIAdaptor implements IWrenAIAdaptor {
       await axios.patch(
         `${this.wrenAIBaseEndpoint}/v1/chart-adjustments/${queryId}`,
         {
-          status: 'stopped',
+          status: "stopped",
         },
       );
     } catch (err: any) {
@@ -703,7 +703,7 @@ export class WrenAIAdaptor implements IWrenAIAdaptor {
       await axios.patch(
         `${this.wrenAIBaseEndpoint}/v1/ask-feedbacks/${queryId}`,
         {
-          status: 'stopped',
+          status: "stopped",
         },
       );
     } catch (err: any) {

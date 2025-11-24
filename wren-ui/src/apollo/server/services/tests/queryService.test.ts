@@ -1,8 +1,8 @@
-import { TelemetryEvent } from '../../telemetry/telemetry';
-import { DataSourceName } from '../../types';
-import { QueryService } from '../queryService';
+import { TelemetryEvent } from "../../telemetry/telemetry";
+import { DataSourceName } from "../../types";
+import { QueryService } from "../queryService";
 
-describe('QueryService', () => {
+describe("QueryService", () => {
   let mockIbisAdaptor;
   let mockWrenEngineAdaptor;
   let mockTelemetry;
@@ -28,80 +28,80 @@ describe('QueryService', () => {
     jest.clearAllMocks();
   });
 
-  it('should return true and send event when previewing via ibis dry run succeeds', async () => {
+  it("should return true and send event when previewing via ibis dry run succeeds", async () => {
     mockIbisAdaptor.dryRun.mockResolvedValue({
-      correlationId: '123',
-      processTime: '1s',
+      correlationId: "123",
+      processTime: "1s",
     });
 
-    const res = await queryService.preview('SELECT * FROM test', {
+    const res = await queryService.preview("SELECT * FROM test", {
       project: { type: DataSourceName.POSTGRES, connectionInfo: {} },
       manifest: {},
       dryRun: true,
     });
 
-    expect(res).toEqual({ correlationId: '123' });
+    expect(res).toEqual({ correlationId: "123" });
     expect(mockTelemetry.records).toHaveLength(1);
     expect(mockTelemetry.records[0]).toEqual({
       event: TelemetryEvent.IBIS_DRY_RUN,
       properties: {
-        correlationId: '123',
-        processTime: '1s',
-        sql: 'SELECT * FROM test',
+        correlationId: "123",
+        processTime: "1s",
+        sql: "SELECT * FROM test",
         dataSource: DataSourceName.POSTGRES,
       },
       actionSuccess: true,
     });
   });
 
-  it('should send event when previewing via ibis dry run fails', async () => {
+  it("should send event when previewing via ibis dry run fails", async () => {
     mockIbisAdaptor.dryRun.mockRejectedValue({
-      message: 'Error message',
+      message: "Error message",
       extensions: {
         other: {
-          correlationId: '123',
-          processTime: '1s',
+          correlationId: "123",
+          processTime: "1s",
         },
       },
     });
 
     try {
-      await queryService.preview('SELECT * FROM test', {
+      await queryService.preview("SELECT * FROM test", {
         project: { type: DataSourceName.POSTGRES, connectionInfo: {} },
         manifest: {},
         dryRun: true,
       });
     } catch (e) {
-      expect(e.message).toEqual('Error message');
-      expect(e.extensions.other.correlationId).toEqual('123');
-      expect(e.extensions.other.processTime).toEqual('1s');
+      expect(e.message).toEqual("Error message");
+      expect(e.extensions.other.correlationId).toEqual("123");
+      expect(e.extensions.other.processTime).toEqual("1s");
     }
 
     expect(mockTelemetry.records).toHaveLength(1);
     expect(mockTelemetry.records[0]).toEqual({
       event: TelemetryEvent.IBIS_DRY_RUN,
       properties: {
-        correlationId: '123',
-        processTime: '1s',
-        sql: 'SELECT * FROM test',
+        correlationId: "123",
+        processTime: "1s",
+        sql: "SELECT * FROM test",
         dataSource: DataSourceName.POSTGRES,
-        error: 'Error message',
+        error: "Error message",
       },
       actionSuccess: false,
       service: undefined,
     });
   });
 
-  it('should return data and send event when previewing via ibis query succeeds', async () => {
+  it("should return data and send event when previewing via ibis query succeeds", async () => {
     mockIbisAdaptor.query.mockResolvedValue({
       data: [],
       columns: [],
       dtypes: [],
-      correlationId: '123',
-      processTime: '1s',
+      correlationId: "123",
+      processTime: "1s",
     });
 
-    const res = await queryService.preview('SELECT * FROM test', {
+    const res = await queryService.preview("SELECT * FROM test", {
       project: { type: DataSourceName.POSTGRES, connectionInfo: {} },
       manifest: {},
       limit: 10,
@@ -112,37 +112,37 @@ describe('QueryService', () => {
     expect(mockTelemetry.records[0]).toEqual({
       event: TelemetryEvent.IBIS_QUERY,
       properties: {
-        correlationId: '123',
-        processTime: '1s',
-        sql: 'SELECT * FROM test',
+        correlationId: "123",
+        processTime: "1s",
+        sql: "SELECT * FROM test",
         dataSource: DataSourceName.POSTGRES,
       },
       actionSuccess: true,
     });
   });
 
-  it('should send event when previewing via ibis query fails', async () => {
+  it("should send event when previewing via ibis query fails", async () => {
     mockIbisAdaptor.query.mockRejectedValue({
-      message: 'Error message',
+      message: "Error message",
       extensions: {
         other: {
-          correlationId: '123',
-          processTime: '1s',
+          correlationId: "123",
+          processTime: "1s",
         },
       },
     });
 
     await expect(
-      queryService.preview('SELECT * FROM test', {
+      queryService.preview("SELECT * FROM test", {
         project: { type: DataSourceName.POSTGRES, connectionInfo: {} },
         manifest: {},
       }),
     ).rejects.toMatchObject({
-      message: 'Error message',
+      message: "Error message",
       extensions: {
         other: {
-          correlationId: '123',
-          processTime: '1s',
+          correlationId: "123",
+          processTime: "1s",
         },
       },
     });
@@ -151,11 +151,11 @@ describe('QueryService', () => {
     expect(mockTelemetry.records[0]).toEqual({
       event: TelemetryEvent.IBIS_QUERY,
       properties: {
-        correlationId: '123',
-        processTime: '1s',
-        sql: 'SELECT * FROM test',
+        correlationId: "123",
+        processTime: "1s",
+        sql: "SELECT * FROM test",
         dataSource: DataSourceName.POSTGRES,
-        error: 'Error message',
+        error: "Error message",
       },
       actionSuccess: false,
       service: undefined,

@@ -7,44 +7,44 @@ import {
   RelationData,
   RelationType,
   SampleDatasetData,
-} from '../types';
+} from "../types";
 import {
   trim,
   getLogger,
   replaceInvalidReferenceName,
   transformInvalidColumnName,
   handleNestedColumns,
-} from '@server/utils';
+} from "@server/utils";
 import {
   DUCKDB_CONNECTION_INFO,
   Model,
   ModelColumn,
   Project,
-} from '../repositories';
+} from "../repositories";
 import {
   SampleDatasetName,
   SampleDatasetRelationship,
   buildInitSql,
   getRelations,
   sampleDatasets,
-} from '@server/data';
-import { snakeCase } from 'lodash';
-import { CompactTable, ProjectData } from '../services';
-import { DuckDBPrepareOptions } from '@server/adaptors/wrenEngineAdaptor';
+} from "@server/data";
+import { snakeCase } from "lodash";
+import { CompactTable, ProjectData } from "../services";
+import { DuckDBPrepareOptions } from "@server/adaptors/wrenEngineAdaptor";
 import DataSourceSchemaDetector, {
   SchemaChangeType,
-} from '@server/managers/dataSourceSchemaDetector';
-import { encryptConnectionInfo } from '../dataSource';
-import { TelemetryEvent } from '../telemetry/telemetry';
+} from "@server/managers/dataSourceSchemaDetector";
+import { encryptConnectionInfo } from "../dataSource";
+import { TelemetryEvent } from "../telemetry/telemetry";
 
-const logger = getLogger('DataSourceResolver');
-logger.level = 'debug';
+const logger = getLogger("DataSourceResolver");
+logger.level = "debug";
 
 export enum OnboardingStatusEnum {
-  NOT_STARTED = 'NOT_STARTED',
-  DATASOURCE_SAVED = 'DATASOURCE_SAVED',
-  ONBOARDING_FINISHED = 'ONBOARDING_FINISHED',
-  WITH_SAMPLE_DATASET = 'WITH_SAMPLE_DATASET',
+  NOT_STARTED = "NOT_STARTED",
+  DATASOURCE_SAVED = "DATASOURCE_SAVED",
+  ONBOARDING_FINISHED = "ONBOARDING_FINISHED",
+  WITH_SAMPLE_DATASET = "WITH_SAMPLE_DATASET",
 }
 
 export class ProjectResolver {
@@ -74,7 +74,7 @@ export class ProjectResolver {
     const dataSourceType = project.type;
 
     return {
-      productVersion: ctx.config.wrenProductVersion || '',
+      productVersion: ctx.config.wrenProductVersion || "",
       dataSource: {
         type: dataSourceType,
         properties: {
@@ -158,10 +158,10 @@ export class ProjectResolver {
     const { name } = _arg.data;
     const dataset = sampleDatasets[snakeCase(name)];
     if (!dataset) {
-      throw new Error('Sample dataset not found');
+      throw new Error("Sample dataset not found");
     }
     if (!(name in SampleDatasetName)) {
-      throw new Error('Invalid sample dataset name');
+      throw new Error("Invalid sample dataset name");
     }
     const eventName = TelemetryEvent.CONNECTION_START_SAMPLE_DATASET;
     const eventProperties = {
@@ -275,9 +275,9 @@ export class ProjectResolver {
     logger.debug(`Project created.`);
 
     // init dashboard
-    logger.debug('Dashboard init...');
+    logger.debug("Dashboard init...");
     await ctx.dashboardService.initDashboard();
-    logger.debug('Dashboard created.');
+    logger.debug("Dashboard created.");
 
     const eventName = TelemetryEvent.CONNECTION_SAVE_DATA_SOURCE;
     const eventProperties = {
@@ -308,7 +308,7 @@ export class ProjectResolver {
       ctx.telemetry.sendEvent(eventName, eventProperties);
     } catch (err) {
       logger.error(
-        'Failed to get project tables',
+        "Failed to get project tables",
         JSON.stringify(err, null, 2),
       );
       await ctx.projectRepository.deleteOne(project.id);
@@ -735,7 +735,7 @@ export class ProjectResolver {
             displayName: column.name,
             referenceName: transformInvalidColumnName(column.name),
             sourceColumnName: column.name,
-            type: column.type || 'string',
+            type: column.type || "string",
             notNull: column.notNull || false,
             isPk: primaryKey === column.name,
             properties: column.properties
@@ -766,7 +766,7 @@ export class ProjectResolver {
   private concatInitSql(initSql: string, extensions: string[]) {
     const installExtensions = extensions
       .map((ext) => `INSTALL ${ext};`)
-      .join('\n');
+      .join("\n");
     return trim(`${installExtensions}\n${initSql}`);
   }
 
@@ -790,7 +790,7 @@ export class ProjectResolver {
 
     // patch wren-engine config
     const config = {
-      'wren.datasource.type': 'duckdb',
+      "wren.datasource.type": "duckdb",
     };
     await ctx.wrenEngineAdaptor.patchConfig(config);
   }

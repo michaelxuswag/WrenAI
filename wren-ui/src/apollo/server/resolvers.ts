@@ -1,15 +1,15 @@
-import GraphQLJSON from 'graphql-type-json';
-import { ProjectResolver } from './resolvers/projectResolver';
-import { ModelResolver } from './resolvers/modelResolver';
-import { AskingResolver } from './resolvers/askingResolver';
-import { DiagramResolver } from './resolvers/diagramResolver';
-import { LearningResolver } from './resolvers/learningResolver';
-import { DashboardResolver } from './resolvers/dashboardResolver';
-import { SqlPairResolver } from './resolvers/sqlPairResolver';
-import { InstructionResolver } from './resolvers/instructionResolver';
-import { ApiHistoryResolver } from './resolvers/apiHistoryResolver';
-import { convertColumnType } from '@server/utils';
-import { DialectSQLScalar } from './scalars';
+import GraphQLJSON from "graphql-type-json";
+import { ProjectResolver } from "./resolvers/projectResolver";
+import { ModelResolver } from "./resolvers/modelResolver";
+import { AskingResolver } from "./resolvers/askingResolver";
+import { DiagramResolver } from "./resolvers/diagramResolver";
+import { LearningResolver } from "./resolvers/learningResolver";
+import { DashboardResolver } from "./resolvers/dashboardResolver";
+import { SqlPairResolver } from "./resolvers/sqlPairResolver";
+import { InstructionResolver } from "./resolvers/instructionResolver";
+import { ApiHistoryResolver } from "./resolvers/apiHistoryResolver";
+import { convertColumnType } from "@server/utils";
+import { DialectSQLScalar } from "./scalars";
 
 const projectResolver = new ProjectResolver();
 const modelResolver = new ModelResolver();

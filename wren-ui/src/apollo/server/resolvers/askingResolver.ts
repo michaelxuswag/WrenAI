@@ -6,31 +6,31 @@ import {
   RecommendationQuestionStatus,
   ChartAdjustmentOption,
   AskFeedbackStatus,
-} from '@server/models/adaptor';
-import { Thread } from '../repositories/threadRepository';
+} from "@server/models/adaptor";
+import { Thread } from "../repositories/threadRepository";
 import {
   DetailStep,
   ThreadResponse,
-} from '../repositories/threadResponseRepository';
-import { reduce } from 'lodash';
-import { IContext } from '../types';
-import { getLogger } from '@server/utils';
-import { safeFormatSQL } from '@server/utils/sqlFormat';
+} from "../repositories/threadResponseRepository";
+import { reduce } from "lodash";
+import { IContext } from "../types";
+import { getLogger } from "@server/utils";
+import { safeFormatSQL } from "@server/utils/sqlFormat";
 import {
   AskingDetailTaskInput,
   constructCteSql,
   ThreadRecommendQuestionResult,
-} from '../services/askingService';
+} from "../services/askingService";
 import {
   SuggestedQuestion,
   SampleDatasetName,
   getSampleAskQuestions,
-} from '../data';
-import { TelemetryEvent, WrenService } from '../telemetry/telemetry';
-import { TrackedAskingResult } from '../services';
+} from "../data";
+import { TelemetryEvent, WrenService } from "../telemetry/telemetry";
+import { TrackedAskingResult } from "../services";
 
-const logger = getLogger('AskingResolver');
-logger.level = 'debug';
+const logger = getLogger("AskingResolver");
+logger.level = "debug";
 
 export interface SuggestedQuestionResponse {
   questions: SuggestedQuestion[];
@@ -700,7 +700,7 @@ export class AskingResolver {
 
       const formattedContent = content
         // replace the \\n to \n
-        .replace(/\\n/g, '\n')
+        .replace(/\\n/g, "\n")
         // replace the \\\" to \",
         .replace(/\\"/g, '"');
 

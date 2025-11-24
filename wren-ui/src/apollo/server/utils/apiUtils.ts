@@ -1,8 +1,8 @@
-import { NextApiResponse } from 'next';
-import { v4 as uuidv4 } from 'uuid';
-import { ApiType, ApiHistory } from '@server/repositories/apiHistoryRepository';
-import * as Errors from '@server/utils/error';
-import { components } from '@/common';
+import { NextApiResponse } from "next";
+import { v4 as uuidv4 } from "uuid";
+import { ApiType, ApiHistory } from "@server/repositories/apiHistoryRepository";
+import * as Errors from "@server/utils/error";
+import { components } from "@/common";
 import {
   AskResult,
   AskResultStatus,
@@ -10,7 +10,7 @@ import {
   WrenAIError,
   TextBasedAnswerResult,
   TextBasedAnswerStatus,
-} from '@/apollo/server/models/adaptor';
+} from "@/apollo/server/models/adaptor";
 
 const { apiHistoryRepository } = components;
 
@@ -38,7 +38,7 @@ export const validateAskResult = (
   // Check for error in result
   if (result.error) {
     const errorMessage =
-      (result.error as WrenAIError).message || 'Unknown error';
+      (result.error as WrenAIError).message || "Unknown error";
     const additionalData: Record<string, any> = {};
 
     // Include invalid SQL if available
@@ -80,7 +80,7 @@ export const validateSummaryResult = (result: TextBasedAnswerResult): void => {
   // Check for errors or failed status
   if (result.status === TextBasedAnswerStatus.FAILED || result.error) {
     throw new ApiError(
-      result.error?.message || 'Failed to generate summary',
+      result.error?.message || "Failed to generate summary",
       400,
       Errors.GeneralErrorCodes.INTERNAL_SERVER_ERROR,
     );
@@ -88,7 +88,7 @@ export const validateSummaryResult = (result: TextBasedAnswerResult): void => {
 
   // Verify that the status is succeeded
   if (result.status !== TextBasedAnswerStatus.SUCCEEDED) {
-    throw new ApiError('Summary generation is still in progress', 500);
+    throw new ApiError("Summary generation is still in progress", 500);
   }
 };
 
@@ -141,7 +141,7 @@ export const validateSql = async (
     });
   } catch (err: any) {
     throw new ApiError(
-      err.message || 'Invalid SQL',
+      err.message || "Invalid SQL",
       400,
       Errors.GeneralErrorCodes.INVALID_SQL_ERROR,
     );

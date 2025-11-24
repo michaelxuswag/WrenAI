@@ -2,14 +2,14 @@ import {
   IModelColumnRepository,
   ModelColumn,
   ModelNestedColumn,
-} from '@server/repositories';
-import { replaceAllowableSyntax } from './regex';
-import { CompactColumn } from '@server/services/metadataService';
+} from "@server/repositories";
+import { replaceAllowableSyntax } from "./regex";
+import { CompactColumn } from "@server/services/metadataService";
 
 export function getPreviewColumnsStr(modelColumns: ModelColumn[]) {
-  if (modelColumns.length === 0) return '*';
+  if (modelColumns.length === 0) return "*";
   const columns = modelColumns.map((column) => `"${column.referenceName}"`);
-  return columns.join(',');
+  return columns.join(",");
 }
 
 export function transformInvalidColumnName(columnName: string) {
@@ -24,7 +24,7 @@ export function transformInvalidColumnName(columnName: string) {
 
 export function replaceInvalidReferenceName(referenceName: string) {
   // replace dot with underscore
-  return referenceName.replace(/\./g, '_');
+  return referenceName.replace(/\./g, "_");
 }
 
 export function findColumnsToUpdate(
@@ -69,7 +69,7 @@ export function findColumnsToUpdate(
       {
         id: existingColumn.id,
         sourceColumnName: sourceColumn.name,
-        type: sourceColumn.type || 'string',
+        type: sourceColumn.type || "string",
       },
     ];
   }, []);
@@ -115,8 +115,8 @@ export function handleNestedColumns(
       columnPath,
       displayName: nestedColumn.name,
       sourceColumnName: nestedColumn.name,
-      referenceName: columnPath.map(transformInvalidColumnName).join('.'),
-      type: nestedColumn.type || 'string',
+      referenceName: columnPath.map(transformInvalidColumnName).join("."),
+      type: nestedColumn.type || "string",
       properties: nestedColumn.properties,
     } as Partial<ModelNestedColumn>;
     nestedColumnValues.push(nestedColumnValue);

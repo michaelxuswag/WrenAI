@@ -1,10 +1,10 @@
-import { Knex } from 'knex';
+import { Knex } from "knex";
 import {
   BaseRepository,
   IBasicRepository,
   IQueryOptions,
-} from './baseRepository';
-import { RelationData } from '../types';
+} from "./baseRepository";
+import { RelationData } from "../types";
 
 export interface Relation {
   id: number; // ID
@@ -63,7 +63,7 @@ export class RelationRepository
   implements IRelationRepository
 {
   constructor(knexPg: Knex) {
-    super({ knexPg, tableName: 'relation' });
+    super({ knexPg, tableName: "relation" });
   }
 
   public async findRelationsBy(
@@ -78,16 +78,16 @@ export class RelationRepository
     // select the leftModel name and rightModel name along with relation
     const builder = executer(this.tableName)
       .join(
-        'model_column AS fmc',
+        "model_column AS fmc",
         `${this.tableName}.from_column_id`,
-        '=',
-        'fmc.id',
+        "=",
+        "fmc.id",
       )
       .join(
-        'model_column AS tmc',
+        "model_column AS tmc",
         `${this.tableName}.to_column_id`,
-        '=',
-        'tmc.id',
+        "=",
+        "tmc.id",
       );
     if (columnIds && columnIds.length > 0) {
       builder
@@ -96,14 +96,14 @@ export class RelationRepository
     }
     if (modelIds && modelIds.length > 0) {
       builder
-        .whereIn('fmc.model_id', modelIds)
-        .orWhereIn('tmc.model_id', modelIds);
+        .whereIn("fmc.model_id", modelIds)
+        .orWhereIn("tmc.model_id", modelIds);
     }
 
     const result = await builder.select(
       `${this.tableName}.*`,
-      'fmc.model_id AS fromModelId',
-      'tmc.model_id AS toModelId',
+      "fmc.model_id AS fromModelId",
+      "tmc.model_id AS toModelId",
     );
     return result.map((r) => this.transformFromDBData(r));
   }
@@ -116,8 +116,8 @@ export class RelationRepository
     }
 
     const result = await executer(this.tableName)
-      .whereIn('id', ids)
-      .select('*');
+      .whereIn("id", ids)
+      .select("*");
     return result.map((r) => this.transformFromDBData(r));
   }
 
@@ -128,14 +128,14 @@ export class RelationRepository
     if (queryOptions && queryOptions.tx) {
       const { tx } = queryOptions;
       await tx(this.tableName)
-        .whereIn('from_column_id', columnIds)
-        .orWhereIn('to_column_id', columnIds)
+        .whereIn("from_column_id", columnIds)
+        .orWhereIn("to_column_id", columnIds)
         .delete();
       return;
     }
     await this.knex(this.tableName)
-      .whereIn('from_column_id', columnIds)
-      .orWhereIn('to_column_id', columnIds)
+      .whereIn("from_column_id", columnIds)
+      .orWhereIn("to_column_id", columnIds)
       .delete();
   }
 
@@ -149,19 +149,19 @@ export class RelationRepository
     // select the leftModel name and rightModel name along with relation
     const builder = executer(this.tableName)
       .join(
-        'model_column AS fmc',
+        "model_column AS fmc",
         `${this.tableName}.from_column_id`,
-        '=',
-        'fmc.id',
+        "=",
+        "fmc.id",
       )
       .join(
-        'model_column AS tmc',
+        "model_column AS tmc",
         `${this.tableName}.to_column_id`,
-        '=',
-        'tmc.id',
+        "=",
+        "tmc.id",
       )
-      .join('model AS fm', 'fmc.model_id', '=', 'fm.id')
-      .join('model AS tm', 'tmc.model_id', '=', 'tm.id');
+      .join("model AS fm", "fmc.model_id", "=", "fm.id")
+      .join("model AS tm", "tmc.model_id", "=", "tm.id");
 
     if (projectId) {
       builder.where(`${this.tableName}.project_id`, projectId);
@@ -171,22 +171,22 @@ export class RelationRepository
         .orWhereIn(`${this.tableName}.to_column_id`, columnIds);
     } else if (modelIds && modelIds.length > 0) {
       builder
-        .whereIn('fmc.model_id', modelIds)
-        .orWhereIn('tmc.model_id', modelIds);
+        .whereIn("fmc.model_id", modelIds)
+        .orWhereIn("tmc.model_id", modelIds);
     }
 
     const result = await builder.select(
       `${this.tableName}.*`,
-      'fm.id AS fromModelId',
-      'fm.reference_name AS fromModelName',
-      'fm.display_name AS fromModelDisplayName',
-      'tm.id AS toModelId',
-      'tm.reference_name AS toModelName',
-      'tm.display_name AS toModelDisplayName',
-      'fmc.reference_name AS fromColumnName',
-      'fmc.display_name AS fromColumnDisplayName',
-      'tmc.reference_name AS toColumnName',
-      'tmc.display_name AS toColumnDisplayName',
+      "fm.id AS fromModelId",
+      "fm.reference_name AS fromModelName",
+      "fm.display_name AS fromModelDisplayName",
+      "tm.id AS toModelId",
+      "tm.reference_name AS toModelName",
+      "tm.display_name AS toModelDisplayName",
+      "fmc.reference_name AS fromColumnName",
+      "fmc.display_name AS fromColumnDisplayName",
+      "tmc.reference_name AS toColumnName",
+      "tmc.display_name AS toColumnDisplayName",
     );
     return result.map((r) => this.transformFromDBData(r)) as RelationInfo[];
   }
@@ -195,16 +195,16 @@ export class RelationRepository
     const { fromModelId, fromColumnId, toModelId, toColumnId } = relation;
     const query = this.knex(this.tableName)
       .join(
-        'model_column AS fmc',
+        "model_column AS fmc",
         `${this.tableName}.from_column_id`,
-        '=',
-        'fmc.id',
+        "=",
+        "fmc.id",
       )
       .join(
-        'model_column AS tmc',
+        "model_column AS tmc",
         `${this.tableName}.to_column_id`,
-        '=',
-        'tmc.id',
+        "=",
+        "tmc.id",
       )
       // duplicate relationship check
       .whereRaw(

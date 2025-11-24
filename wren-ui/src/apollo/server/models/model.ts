@@ -52,22 +52,22 @@ export interface UpdateViewMetadataInput {
 }
 
 export enum ExpressionName {
-  ABS = 'ABS',
-  AVG = 'AVG',
-  COUNT = 'COUNT',
-  MAX = 'MAX',
-  MIN = 'MIN',
-  SUM = 'SUM',
-  CBRT = 'CBRT',
-  CEIL = 'CEIL',
-  EXP = 'EXP',
-  FLOOR = 'FLOOR',
-  LN = 'LN',
-  LOG10 = 'LOG10',
-  ROUND = 'ROUND',
-  SIGN = 'SIGN',
-  LENGTH = 'LENGTH',
-  REVERSE = 'REVERSE',
+  ABS = "ABS",
+  AVG = "AVG",
+  COUNT = "COUNT",
+  MAX = "MAX",
+  MIN = "MIN",
+  SUM = "SUM",
+  CBRT = "CBRT",
+  CEIL = "CEIL",
+  EXP = "EXP",
+  FLOOR = "FLOOR",
+  LN = "LN",
+  LOG10 = "LOG10",
+  ROUND = "ROUND",
+  SIGN = "SIGN",
+  LENGTH = "LENGTH",
+  REVERSE = "REVERSE",
 }
 
 export interface CreateCalculatedFieldData {

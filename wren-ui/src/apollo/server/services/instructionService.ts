@@ -1,14 +1,14 @@
-import { pick } from 'lodash';
-import { IWrenAIAdaptor } from '@server/adaptors';
-import { InstructionInput, UpdateInstructionInput } from '@server/models';
+import { pick } from "lodash";
+import { IWrenAIAdaptor } from "@server/adaptors";
+import { InstructionInput, UpdateInstructionInput } from "@server/models";
 import {
   InstructionResult,
   InstructionStatus,
   GenerateInstructionInput,
-} from '@server/models/adaptor';
-import { IInstructionRepository, Instruction } from '@server/repositories';
-import * as Errors from '@server/utils/error';
-import { GeneralErrorCodes } from '@server/utils/error';
+} from "@server/models/adaptor";
+import { IInstructionRepository, Instruction } from "@server/repositories";
+import * as Errors from "@server/utils/error";
+import { GeneralErrorCodes } from "@server/utils/error";
 export interface IInstructionService {
   getInstructions(projectId: number): Promise<Instruction[]>;
   getInstruction(id: number): Promise<Instruction>;
@@ -121,7 +121,7 @@ export class InstructionService implements IInstructionService {
         },
       );
       if (!instruction) {
-        throw new Error('Instruction not found');
+        throw new Error("Instruction not found");
       }
       const instructionData = {
         ...instruction,
@@ -158,7 +158,7 @@ export class InstructionService implements IInstructionService {
         { tx },
       );
       if (!instruction) {
-        throw new Error('Instruction not found');
+        throw new Error("Instruction not found");
       }
       await this.instructionRepository.deleteOne(id, { tx });
       await this.wrenAIAdaptor.deleteInstructions([id], instruction.projectId);
@@ -199,20 +199,20 @@ export class InstructionService implements IInstructionService {
     instruction: Instruction,
   ): GenerateInstructionInput {
     return pick(instruction, [
-      'id',
-      'projectId',
-      'instruction',
-      'questions',
-      'isDefault',
+      "id",
+      "projectId",
+      "instruction",
+      "questions",
+      "isDefault",
     ]);
   }
 
   private validateInstructionInput(input: InstructionInput): void {
     if (!input.instruction) {
-      throw new Error('Instruction is required');
+      throw new Error("Instruction is required");
     }
     if (input.instruction.length > 1000) {
-      throw new Error('Instruction is too long');
+      throw new Error("Instruction is too long");
     }
   }
 }

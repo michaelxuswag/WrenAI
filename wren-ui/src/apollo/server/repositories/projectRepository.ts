@@ -1,5 +1,5 @@
-import { Knex } from 'knex';
-import { BaseRepository, IBasicRepository } from './baseRepository';
+import { Knex } from "knex";
+import { BaseRepository, IBasicRepository } from "./baseRepository";
 import {
   camelCase,
   isPlainObject,
@@ -7,9 +7,9 @@ import {
   mapValues,
   snakeCase,
   isEmpty,
-} from 'lodash';
-import { DataSourceName } from '@server/types';
-import { IbisRedshiftConnectionType } from '@server/adaptors/ibisAdaptor';
+} from "lodash";
+import { DataSourceName } from "@server/types";
+import { IbisRedshiftConnectionType } from "@server/adaptors/ibisAdaptor";
 
 export interface BIG_QUERY_CONNECTION_INFO {
   projectId: string;
@@ -163,33 +163,33 @@ export class ProjectRepository
   extends BaseRepository<Project>
   implements IProjectRepository
 {
-  private jsonTypeColumns = ['questions', 'questions_error', 'connection_info'];
+  private jsonTypeColumns = ["questions", "questions_error", "connection_info"];
 
   constructor(knexPg: Knex) {
-    super({ knexPg, tableName: 'project' });
+    super({ knexPg, tableName: "project" });
   }
 
   public async getCurrentProject() {
     const projects = await this.findAll({
-      order: 'id',
+      order: "id",
       limit: 1,
     });
     if (!projects.length) {
-      throw new Error('No project found');
+      throw new Error("No project found");
     }
     return projects[0];
   }
 
   public override transformFromDBData: (data: any) => Project = (data: any) => {
     if (!isPlainObject(data)) {
-      throw new Error('Unexpected db data');
+      throw new Error("Unexpected db data");
     }
     const formattedData = mapValues(data, (value, key) => {
-      if (this.jsonTypeColumns.includes(key) && typeof value === 'string') {
+      if (this.jsonTypeColumns.includes(key) && typeof value === "string") {
         // should return {} if value is null / {}, use value ? {} : JSON.parse(value) will throw error when value is null
         return isEmpty(value) ? {} : JSON.parse(value);
       }
-      if (key === 'type') {
+      if (key === "type") {
         return DataSourceName[value];
       }
       return value;
@@ -204,11 +204,11 @@ export class ProjectRepository
     data: Project,
   ) => {
     if (!isPlainObject(data)) {
-      throw new Error('Unexpected db data');
+      throw new Error("Unexpected db data");
     }
     const snakeCaseData = mapKeys(data, (_value, key) => snakeCase(key));
     const formattedData = mapValues(snakeCaseData, (value, key) => {
-      if (this.jsonTypeColumns.includes(key) && typeof value !== 'string') {
+      if (this.jsonTypeColumns.includes(key) && typeof value !== "string") {
         return JSON.stringify(value);
       }
       return value;

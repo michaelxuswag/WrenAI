@@ -1,22 +1,22 @@
-import axios from 'axios';
-import { WrenAIAdaptor } from '../wrenAIAdaptor';
+import axios from "axios";
+import { WrenAIAdaptor } from "../wrenAIAdaptor";
 import {
   RecommendationQuestionsInput,
   RecommendationQuestionStatus,
-} from '@server/models/adaptor';
-import { Manifest } from '../../mdl/type';
+} from "@server/models/adaptor";
+import { Manifest } from "../../mdl/type";
 
-jest.mock('axios');
+jest.mock("axios");
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 
 const sampleManifest: Manifest = {
   models: [
     {
-      name: 'model1',
+      name: "model1",
       columns: [
         {
-          name: 'column1',
-          type: 'string',
+          name: "column1",
+          type: "string",
           isCalculated: false,
         },
       ],
@@ -24,8 +24,8 @@ const sampleManifest: Manifest = {
   ],
 };
 
-describe('WrenAIAdaptor', () => {
-  const baseEndpoint = 'http://test-endpoint';
+describe("WrenAIAdaptor", () => {
+  const baseEndpoint = "http://test-endpoint";
   let adaptor: WrenAIAdaptor;
 
   beforeEach(() => {
@@ -33,20 +33,20 @@ describe('WrenAIAdaptor', () => {
     jest.clearAllMocks();
   });
 
-  describe('generateRecommendationQuestions', () => {
+  describe("generateRecommendationQuestions", () => {
     const mockInput: RecommendationQuestionsInput = {
       manifest: sampleManifest,
-      previousQuestions: ['What is sales by region?'],
-      projectId: 'project-123',
+      previousQuestions: ["What is sales by region?"],
+      projectId: "project-123",
       maxQuestions: 5,
       maxCategories: 3,
       configuration: {
-        language: 'English',
+        language: "English",
       },
     };
 
-    it('should successfully generate recommendation questions', async () => {
-      const mockQueryId = 'query-123';
+    it("should successfully generate recommendation questions", async () => {
+      const mockQueryId = "query-123";
       mockedAxios.post.mockResolvedValueOnce({ data: { id: mockQueryId } });
 
       const result = await adaptor.generateRecommendationQuestions(mockInput);
@@ -65,8 +65,8 @@ describe('WrenAIAdaptor', () => {
       );
     });
 
-    it('should handle errors when generating recommendation questions', async () => {
-      const errorMessage = 'Network error';
+    it("should handle errors when generating recommendation questions", async () => {
+      const errorMessage = "Network error";
       mockedAxios.post.mockRejectedValueOnce(new Error(errorMessage));
 
       await expect(
@@ -75,18 +75,18 @@ describe('WrenAIAdaptor', () => {
     });
   });
 
-  describe('getRecommendationQuestionsResult', () => {
-    const queryId = 'query-123';
+  describe("getRecommendationQuestionsResult", () => {
+    const queryId = "query-123";
 
-    it('should successfully get recommendation questions result', async () => {
+    it("should successfully get recommendation questions result", async () => {
       const mockResponse = {
-        status: 'FINISHED',
+        status: "FINISHED",
         response: {
           questions: [
             {
-              question: 'What is the total revenue?',
-              explanation: 'This shows overall business performance',
-              category: 'Revenue',
+              question: "What is the total revenue?",
+              explanation: "This shows overall business performance",
+              category: "Revenue",
             },
           ],
         },
@@ -106,8 +106,8 @@ describe('WrenAIAdaptor', () => {
       );
     });
 
-    it('should handle errors when getting recommendation questions result', async () => {
-      const errorMessage = 'Network error';
+    it("should handle errors when getting recommendation questions result", async () => {
+      const errorMessage = "Network error";
       mockedAxios.get.mockRejectedValueOnce(new Error(errorMessage));
 
       await expect(

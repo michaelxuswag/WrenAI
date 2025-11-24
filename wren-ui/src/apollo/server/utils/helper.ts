@@ -11,7 +11,7 @@ export const safeParseJson = (data) => {
 };
 
 export const safeStringify = (data) => {
-  if (typeof data === 'string') {
+  if (typeof data === "string") {
     return data;
   }
   try {
@@ -22,5 +22,5 @@ export const safeStringify = (data) => {
 };
 
 export const convertColumnType = (parent: { type: string }) => {
-  return parent.type.includes('STRUCT') ? 'RECORD' : parent.type;
+  return parent.type.includes("STRUCT") ? "RECORD" : parent.type;
 };

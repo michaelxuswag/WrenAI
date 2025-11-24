@@ -1,17 +1,17 @@
-import { IProjectRepository } from '../repositories/projectRepository';
-import { RecommendationQuestionStatus } from '@server/models/adaptor';
-import { IWrenAIAdaptor } from '../adaptors/wrenAIAdaptor';
-import { IThreadRepository, Project, Thread } from '../repositories';
+import { IProjectRepository } from "../repositories/projectRepository";
+import { RecommendationQuestionStatus } from "@server/models/adaptor";
+import { IWrenAIAdaptor } from "../adaptors/wrenAIAdaptor";
+import { IThreadRepository, Project, Thread } from "../repositories";
 import {
   ITelemetry,
   TelemetryEvent,
   WrenService,
-} from '../telemetry/telemetry';
-import { getLogger } from '../utils/logger';
-import { Logger } from 'log4js';
+} from "../telemetry/telemetry";
+import { getLogger } from "../utils/logger";
+import { Logger } from "log4js";
 
 // PRQ background tracker : project recommend question background tracker
-const loggerPrefix = 'PRQBT:';
+const loggerPrefix = "PRQBT:";
 
 const isFinalized = (status: RecommendationQuestionStatus) => {
   return [
@@ -39,8 +39,8 @@ export class ProjectRecommendQuestionBackgroundTracker {
     wrenAIAdaptor: IWrenAIAdaptor;
     projectRepository: IProjectRepository;
   }) {
-    this.logger = getLogger('PRQ Background Tracker');
-    this.logger.level = 'debug';
+    this.logger = getLogger("PRQ Background Tracker");
+    this.logger.level = "debug";
     this.telemetry = telemetry;
     this.wrenAIAdaptor = wrenAIAdaptor;
     this.projectRepository = projectRepository;
@@ -49,7 +49,7 @@ export class ProjectRecommendQuestionBackgroundTracker {
   }
 
   public start() {
-    this.logger.info('Recommend question background tracker started');
+    this.logger.info("Recommend question background tracker started");
     setInterval(() => {
       const jobs = Object.values(this.tasks).map((project) => async () => {
         // check if same job is running
@@ -133,7 +133,7 @@ export class ProjectRecommendQuestionBackgroundTracker {
       Promise.allSettled(jobs.map((job) => job())).then((results) => {
         // show reason of rejection
         results.forEach((result, index) => {
-          if (result.status === 'rejected') {
+          if (result.status === "rejected") {
             this.logger.error(`Job ${index} failed: ${result.reason}`);
           }
         });
@@ -189,8 +189,8 @@ export class ThreadRecommendQuestionBackgroundTracker {
     wrenAIAdaptor: IWrenAIAdaptor;
     threadRepository: IThreadRepository;
   }) {
-    this.logger = getLogger('TRQ Background Tracker');
-    this.logger.level = 'debug';
+    this.logger = getLogger("TRQ Background Tracker");
+    this.logger.level = "debug";
     this.telemetry = telemetry;
     this.wrenAIAdaptor = wrenAIAdaptor;
     this.threadRepository = threadRepository;
@@ -199,7 +199,7 @@ export class ThreadRecommendQuestionBackgroundTracker {
   }
 
   public start() {
-    this.logger.info('Recommend question background tracker started');
+    this.logger.info("Recommend question background tracker started");
     setInterval(() => {
       const jobs = Object.values(this.tasks).map((thread) => async () => {
         // check if same job is running
@@ -282,7 +282,7 @@ export class ThreadRecommendQuestionBackgroundTracker {
       Promise.allSettled(jobs.map((job) => job())).then((results) => {
         // show reason of rejection
         results.forEach((result, index) => {
-          if (result.status === 'rejected') {
+          if (result.status === "rejected") {
             this.logger.error(`Job ${index} failed: ${result.reason}`);
           }
         });

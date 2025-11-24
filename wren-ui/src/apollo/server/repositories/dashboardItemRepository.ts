@@ -1,24 +1,24 @@
-import { Knex } from 'knex';
-import { BaseRepository, IBasicRepository } from './baseRepository';
+import { Knex } from "knex";
+import { BaseRepository, IBasicRepository } from "./baseRepository";
 import {
   camelCase,
   isPlainObject,
   mapKeys,
   mapValues,
   snakeCase,
-} from 'lodash';
+} from "lodash";
 
 export enum DashboardItemType {
   // AI chart types, refer to ChartType in adaptor.ts
-  AREA = 'AREA',
-  BAR = 'BAR',
-  GROUPED_BAR = 'GROUPED_BAR',
-  LINE = 'LINE',
-  PIE = 'PIE',
-  STACKED_BAR = 'STACKED_BAR',
+  AREA = "AREA",
+  BAR = "BAR",
+  GROUPED_BAR = "GROUPED_BAR",
+  LINE = "LINE",
+  PIE = "PIE",
+  STACKED_BAR = "STACKED_BAR",
   // other types
-  TABLE = 'TABLE',
-  NUMBER = 'NUMBER',
+  TABLE = "TABLE",
+  NUMBER = "NUMBER",
 }
 
 export interface DashboardItemLayout {
@@ -49,20 +49,20 @@ export class DashboardItemRepository
   extends BaseRepository<DashboardItem>
   implements IDashboardItemRepository
 {
-  private readonly jsonbColumns = ['layout', 'detail'];
+  private readonly jsonbColumns = ["layout", "detail"];
 
   constructor(knexPg: Knex) {
-    super({ knexPg, tableName: 'dashboard_item' });
+    super({ knexPg, tableName: "dashboard_item" });
   }
 
   protected override transformFromDBData = (data: any) => {
     if (!isPlainObject(data)) {
-      throw new Error('Unexpected dbdata');
+      throw new Error("Unexpected dbdata");
     }
     const camelCaseData = mapKeys(data, (_value, key) => camelCase(key));
     const transformData = mapValues(camelCaseData, (value, key) => {
       if (this.jsonbColumns.includes(key)) {
-        if (typeof value === 'string') {
+        if (typeof value === "string") {
           return value ? JSON.parse(value) : value;
         } else {
           return value;
@@ -75,7 +75,7 @@ export class DashboardItemRepository
 
   protected override transformToDBData = (data: any) => {
     if (!isPlainObject(data)) {
-      throw new Error('Unexpected dbdata');
+      throw new Error("Unexpected dbdata");
     }
     const transformedData = mapValues(data, (value, key) => {
       if (this.jsonbColumns.includes(key)) {

@@ -1,12 +1,12 @@
-import { Knex } from 'knex';
-import { BaseRepository, IBasicRepository } from './baseRepository';
+import { Knex } from "knex";
+import { BaseRepository, IBasicRepository } from "./baseRepository";
 import {
   camelCase,
   isPlainObject,
   mapKeys,
   mapValues,
   snakeCase,
-} from 'lodash';
+} from "lodash";
 
 export interface ModelNestedColumn {
   id: number; // ID
@@ -31,29 +31,29 @@ export class ModelNestedColumnRepository
   implements IModelNestedColumnRepository
 {
   constructor(knexPg: Knex) {
-    super({ knexPg, tableName: 'model_nested_column' });
+    super({ knexPg, tableName: "model_nested_column" });
   }
 
   public findNestedColumnsByModelIds = async (modelIds: number[]) => {
     const result = await this.knex(this.tableName)
-      .select('*')
-      .whereIn('model_id', modelIds);
+      .select("*")
+      .whereIn("model_id", modelIds);
     return result.map((r) => this.transformFromDBData(r));
   };
 
   public findNestedColumnsByIds = async (ids: number[]) => {
     const result = await this.knex(this.tableName)
-      .select('*')
-      .whereIn('id', ids);
+      .select("*")
+      .whereIn("id", ids);
     return result.map((r) => this.transformFromDBData(r));
   };
 
   protected override transformToDBData = (data: any) => {
     if (!isPlainObject(data)) {
-      throw new Error('Unexpected dbdata');
+      throw new Error("Unexpected dbdata");
     }
     const transformedData = mapValues(data, (value, key) => {
-      if (['columnPath', 'properties'].includes(key)) {
+      if (["columnPath", "properties"].includes(key)) {
         return value ? JSON.stringify(value) : null;
       }
       return value;
@@ -63,13 +63,13 @@ export class ModelNestedColumnRepository
 
   protected override transformFromDBData = (data: any): ModelNestedColumn => {
     if (!isPlainObject(data)) {
-      throw new Error('Unexpected dbdata');
+      throw new Error("Unexpected dbdata");
     }
     const camelCaseData = mapKeys(data, (_value, key) => camelCase(key));
     const formattedData = mapValues(camelCaseData, (value, key) => {
-      if (['columnPath', 'properties'].includes(key)) {
+      if (["columnPath", "properties"].includes(key)) {
         // The value from Sqlite will be string type, while the value from PG is JSON object
-        if (typeof value === 'string') {
+        if (typeof value === "string") {
           return value ? JSON.parse(value) : value;
         } else {
           return value;

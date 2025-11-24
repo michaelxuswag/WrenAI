@@ -1,20 +1,20 @@
-import { getLogger } from '@server/utils';
+import { getLogger } from "@server/utils";
 import {
   IDashboardRepository,
   IDashboardItemRepository,
   IDashboardItemRefreshJobRepository,
   DashboardCacheRefreshStatus,
-} from '@server/repositories';
+} from "@server/repositories";
 import {
   IProjectService,
   IDeployService,
   IQueryService,
-} from '@server/services';
-import { CronExpressionParser } from 'cron-parser';
-import { v4 as uuidv4 } from 'uuid';
+} from "@server/services";
+import { CronExpressionParser } from "cron-parser";
+import { v4 as uuidv4 } from "uuid";
 
-const logger = getLogger('DashboardCacheBackgroundTracker');
-logger.level = 'debug';
+const logger = getLogger("DashboardCacheBackgroundTracker");
+logger.level = "debug";
 
 export class DashboardCacheBackgroundTracker {
   private intervalTime: number;
@@ -52,7 +52,7 @@ export class DashboardCacheBackgroundTracker {
   }
 
   private start(): void {
-    logger.info('Dashboard cache background tracker started');
+    logger.info("Dashboard cache background tracker started");
     setInterval(() => {
       this.checkAndRefreshCaches();
     }, this.intervalTime);

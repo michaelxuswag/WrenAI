@@ -1,5 +1,5 @@
-import { Knex } from 'knex';
-import { camelCase, isPlainObject, mapKeys, snakeCase } from 'lodash';
+import { Knex } from "knex";
+import { camelCase, isPlainObject, mapKeys, snakeCase } from "lodash";
 
 export interface IQueryOptions {
   tx?: Knex.Transaction;
@@ -107,7 +107,7 @@ export class BaseRepository<T> implements IBasicRepository<T> {
     const executer = queryOptions?.tx ? queryOptions.tx : this.knex;
     const [result] = await executer(this.tableName)
       .insert(this.transformToDBData(data))
-      .returning('*');
+      .returning("*");
     return this.transformFromDBData(result);
   }
 
@@ -122,7 +122,7 @@ export class BaseRepository<T> implements IBasicRepository<T> {
       const batchValues = data.slice(start, end);
       const chunk = await executer(this.tableName)
         .insert(batchValues.map(this.transformToDBData))
-        .returning('*');
+        .returning("*");
       result.push(...chunk);
     }
 
@@ -138,7 +138,7 @@ export class BaseRepository<T> implements IBasicRepository<T> {
     const [result] = await executer(this.tableName)
       .where({ id })
       .update(this.transformToDBData(data))
-      .returning('*');
+      .returning("*");
     return this.transformFromDBData(result);
   }
 
@@ -153,7 +153,7 @@ export class BaseRepository<T> implements IBasicRepository<T> {
     queryOptions?: IQueryOptions,
   ) {
     const executer = queryOptions?.tx ? queryOptions.tx : this.knex;
-    const builder = executer.from(this.tableName).whereIn('id', ids).delete();
+    const builder = executer.from(this.tableName).whereIn("id", ids).delete();
     return await builder;
   }
 
@@ -170,14 +170,14 @@ export class BaseRepository<T> implements IBasicRepository<T> {
 
   protected transformToDBData = (data: Partial<T>) => {
     if (!isPlainObject(data)) {
-      throw new Error('Unexpected dbdata');
+      throw new Error("Unexpected dbdata");
     }
     return mapKeys(data, (_value, key) => snakeCase(key));
   };
 
   protected transformFromDBData = (data: any): T => {
     if (!isPlainObject(data)) {
-      throw new Error('Unexpected dbdata');
+      throw new Error("Unexpected dbdata");
     }
     const camelCaseData = mapKeys(data, (_value, key) => camelCase(key));
     return camelCaseData as T;

@@ -1,11 +1,11 @@
-import { IContext } from '@server/types';
-import { UpdateInstructionInput } from '@server/models';
-import { Instruction } from '@server/repositories/instructionRepository';
-import { getLogger } from '@server/utils';
-import { TelemetryEvent, TrackTelemetry } from '@server/telemetry/telemetry';
+import { IContext } from "@server/types";
+import { UpdateInstructionInput } from "@server/models";
+import { Instruction } from "@server/repositories/instructionRepository";
+import { getLogger } from "@server/utils";
+import { TelemetryEvent, TrackTelemetry } from "@server/telemetry/telemetry";
 
-const logger = getLogger('InstructionResolver');
-logger.level = 'debug';
+const logger = getLogger("InstructionResolver");
+logger.level = "debug";
 
 export class InstructionResolver {
   constructor() {
@@ -57,7 +57,7 @@ export class InstructionResolver {
     args: {
       data: Pick<
         UpdateInstructionInput,
-        'instruction' | 'questions' | 'isDefault'
+        "instruction" | "questions" | "isDefault"
       >;
       where: { id: number };
     },
@@ -66,7 +66,7 @@ export class InstructionResolver {
     const { id } = args.where;
     const { instruction, questions, isDefault } = args.data;
     if (!id) {
-      throw new Error('Instruction ID is required.');
+      throw new Error("Instruction ID is required.");
     }
     const project = await ctx.projectService.getCurrentProject();
     return await ctx.instructionService.updateInstruction({

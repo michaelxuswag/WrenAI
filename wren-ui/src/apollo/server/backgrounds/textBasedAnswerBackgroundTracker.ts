@@ -1,21 +1,21 @@
-import { IWrenAIAdaptor } from '../adaptors';
+import { IWrenAIAdaptor } from "../adaptors";
 import {
   WrenAILanguage,
   TextBasedAnswerResult,
   TextBasedAnswerStatus,
-} from '../models/adaptor';
-import { ThreadResponse, IThreadResponseRepository } from '../repositories';
+} from "../models/adaptor";
+import { ThreadResponse, IThreadResponseRepository } from "../repositories";
 import {
   IProjectService,
   IDeployService,
   IQueryService,
   ThreadResponseAnswerStatus,
   PreviewDataResponse,
-} from '../services';
-import { getLogger } from '@server/utils';
+} from "../services";
+import { getLogger } from "@server/utils";
 
-const logger = getLogger('TextBasedAnswerBackgroundTracker');
-logger.level = 'debug';
+const logger = getLogger("TextBasedAnswerBackgroundTracker");
+logger.level = "debug";
 
 export class TextBasedAnswerBackgroundTracker {
   // tasks is a kv pair of task id and thread response
@@ -151,7 +151,7 @@ export class TextBasedAnswerBackgroundTracker {
       Promise.allSettled(jobs.map((job) => job())).then((results) => {
         // Show reason of rejection
         results.forEach((result, index) => {
-          if (result.status === 'rejected') {
+          if (result.status === "rejected") {
             logger.error(`Job ${index} failed: ${result.reason}`);
           }
         });

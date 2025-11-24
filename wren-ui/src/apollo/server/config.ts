@@ -1,4 +1,4 @@
-import { pickBy } from 'lodash';
+import { pickBy } from "lodash";
 
 export interface IConfig {
   // wren ui
@@ -53,41 +53,41 @@ const defaultConfig = {
   otherServiceUsingDocker: false,
 
   // database
-  dbType: 'sqlite',
+  dbType: "sqlite",
 
   // pg
-  pgUrl: 'postgres://postgres:postgres@localhost:5432/admin_ui',
+  pgUrl: "postgres://postgres:postgres@localhost:5432/admin_ui",
   debug: false,
 
   // sqlite
-  sqliteFile: './db.sqlite3',
+  sqliteFile: "./db.sqlite3",
 
   persistCredentialDir: `${process.cwd()}/.tmp`,
 
   // wren engine
-  wrenEngineEndpoint: 'http://localhost:8080',
+  wrenEngineEndpoint: "http://localhost:8080",
 
   // wren AI
-  wrenAIEndpoint: 'http://localhost:5555',
+  wrenAIEndpoint: "http://localhost:5555",
 
   // ibis server
   experimentalEngineRustVersion: true,
-  ibisServerEndpoint: 'http://127.0.0.1:8000',
+  ibisServerEndpoint: "http://127.0.0.1:8000",
 
   // encryption
-  encryptionPassword: 'sementic',
-  encryptionSalt: 'layer',
+  encryptionPassword: "sementic",
+  encryptionSalt: "layer",
 };
 
 const config = {
   // node
-  otherServiceUsingDocker: process.env.OTHER_SERVICE_USING_DOCKER === 'true',
+  otherServiceUsingDocker: process.env.OTHER_SERVICE_USING_DOCKER === "true",
 
   // database
   dbType: process.env.DB_TYPE,
   // pg
   pgUrl: process.env.PG_URL,
-  debug: process.env.DEBUG === 'true',
+  debug: process.env.DEBUG === "true",
   // sqlite
   sqliteFile: process.env.SQLITE_FILE,
 
@@ -110,7 +110,7 @@ const config = {
 
   // ibis server
   experimentalEngineRustVersion:
-    process.env.EXPERIMENTAL_ENGINE_RUST_VERSION === 'true',
+    process.env.EXPERIMENTAL_ENGINE_RUST_VERSION === "true",
   ibisServerEndpoint: process.env.IBIS_SERVER_ENDPOINT,
 
   // encryption
@@ -120,7 +120,7 @@ const config = {
   // telemetry
   telemetryEnabled:
     process.env.TELEMETRY_ENABLED &&
-    process.env.TELEMETRY_ENABLED.toLocaleLowerCase() === 'true',
+    process.env.TELEMETRY_ENABLED.toLocaleLowerCase() === "true",
   posthogApiKey: process.env.POSTHOG_API_KEY,
   posthogHost: process.env.POSTHOG_HOST,
   userUUID: process.env.USER_UUID,

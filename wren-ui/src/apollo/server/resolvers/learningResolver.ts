@@ -1,13 +1,13 @@
-import { IContext } from '@server/types';
-import { getConfig } from '@server/config';
+import { IContext } from "@server/types";
+import { getConfig } from "@server/config";
 
-import { getLogger } from '@server/utils';
-import { uniq } from 'lodash';
+import { getLogger } from "@server/utils";
+import { uniq } from "lodash";
 
 const config = getConfig();
 
-const logger = getLogger('LearingResolver');
-logger.level = 'debug';
+const logger = getLogger("LearingResolver");
+logger.level = "debug";
 
 export class LearningResolver {
   constructor() {

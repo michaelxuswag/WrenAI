@@ -1,6 +1,6 @@
 enum ModelType {
-  TABLE = 'TABLE',
-  METRIC = 'METRIC',
+  TABLE = "TABLE",
+  METRIC = "METRIC",
 }
 
 export type CreateSimpleMetricPayload = BaseMetricPaylod & {

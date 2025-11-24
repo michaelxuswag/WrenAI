@@ -1,9 +1,9 @@
-import { Knex } from 'knex';
+import { Knex } from "knex";
 import {
   BaseRepository,
   IBasicRepository,
   IQueryOptions,
-} from './baseRepository';
+} from "./baseRepository";
 
 export interface ModelColumn {
   id: number; // ID
@@ -52,32 +52,32 @@ export class ModelColumnRepository
   implements IModelColumnRepository
 {
   constructor(knexPg: Knex) {
-    super({ knexPg, tableName: 'model_column' });
+    super({ knexPg, tableName: "model_column" });
   }
 
   public async findColumnsByModelIds(modelIds, queryOptions?: IQueryOptions) {
     if (queryOptions && queryOptions.tx) {
       const { tx } = queryOptions;
       const result = await tx(this.tableName)
-        .whereIn('model_id', modelIds)
-        .select('*');
+        .whereIn("model_id", modelIds)
+        .select("*");
       return result.map((r) => this.transformFromDBData(r));
     }
-    const result = await this.knex<ModelColumn>('model_column')
-      .whereIn('model_id', modelIds)
-      .select('*');
+    const result = await this.knex<ModelColumn>("model_column")
+      .whereIn("model_id", modelIds)
+      .select("*");
     return result.map((r) => this.transformFromDBData(r));
   }
 
   public async findColumnsByIds(ids: number[], queryOptions?: IQueryOptions) {
     if (queryOptions && queryOptions.tx) {
       const { tx } = queryOptions;
-      const result = await tx(this.tableName).whereIn('id', ids).select('*');
+      const result = await tx(this.tableName).whereIn("id", ids).select("*");
       return result.map((r) => this.transformFromDBData(r));
     }
-    const result = await this.knex<ModelColumn>('model_column')
-      .whereIn('id', ids)
-      .select('*');
+    const result = await this.knex<ModelColumn>("model_column")
+      .whereIn("id", ids)
+      .select("*");
     return result.map((r) => this.transformFromDBData(r));
   }
 
@@ -87,21 +87,21 @@ export class ModelColumnRepository
   ) {
     if (queryOptions && queryOptions.tx) {
       const { tx } = queryOptions;
-      await tx(this.tableName).whereIn('model_id', modelIds).delete();
+      await tx(this.tableName).whereIn("model_id", modelIds).delete();
       return;
     }
-    await this.knex<ModelColumn>('model_column')
-      .whereIn('model_id', modelIds)
+    await this.knex<ModelColumn>("model_column")
+      .whereIn("model_id", modelIds)
       .delete();
   }
 
   public async resetModelPrimaryKey(modelId: number) {
-    await this.knex<ModelColumn>('model_column')
+    await this.knex<ModelColumn>("model_column")
       .where(this.transformToDBData({ modelId }))
       .update(this.transformToDBData({ isPk: false }));
   }
   public async setModelPrimaryKey(modelId: number, sourceColumnName: string) {
-    await this.knex<ModelColumn>('model_column')
+    await this.knex<ModelColumn>("model_column")
       .where(this.transformToDBData({ modelId, sourceColumnName }))
       .update(this.transformToDBData({ isPk: true }));
   }
@@ -114,7 +114,7 @@ export class ModelColumnRepository
     const executer = queryOptions?.tx ? queryOptions.tx : this.knex;
     const builder = executer(this.tableName)
       .where(this.transformToDBData({ modelId }))
-      .whereIn('source_column_name', sourceColumnNames)
+      .whereIn("source_column_name", sourceColumnNames)
       .delete();
     return await builder;
   }
@@ -125,7 +125,7 @@ export class ModelColumnRepository
   ): Promise<void> {
     const executer = queryOptions?.tx ? queryOptions.tx : this.knex;
     await executer<ModelColumn>(this.tableName)
-      .whereIn('id', columnIds)
+      .whereIn("id", columnIds)
       .delete();
   }
 }

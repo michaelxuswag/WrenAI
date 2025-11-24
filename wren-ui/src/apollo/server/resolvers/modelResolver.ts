@@ -6,36 +6,36 @@ import {
   UpdateCalculatedFieldData,
   UpdateViewMetadataInput,
   PreviewSQLData,
-} from '../models';
+} from "../models";
 import {
   DataSourceName,
   IContext,
   RelationData,
   UpdateRelationData,
-} from '../types';
-import { getLogger, transformInvalidColumnName } from '@server/utils';
-import { DeployResponse } from '../services/deployService';
-import { safeFormatSQL } from '@server/utils/sqlFormat';
-import { isEmpty, isNil } from 'lodash';
-import { replaceAllowableSyntax, validateDisplayName } from '../utils/regex';
-import { Model, ModelColumn } from '../repositories';
+} from "../types";
+import { getLogger, transformInvalidColumnName } from "@server/utils";
+import { DeployResponse } from "../services/deployService";
+import { safeFormatSQL } from "@server/utils/sqlFormat";
+import { isEmpty, isNil } from "lodash";
+import { replaceAllowableSyntax, validateDisplayName } from "../utils/regex";
+import { Model, ModelColumn } from "../repositories";
 import {
   findColumnsToUpdate,
   getPreviewColumnsStr,
   handleNestedColumns,
   replaceInvalidReferenceName,
   updateModelPrimaryKey,
-} from '../utils/model';
-import { CompactTable, PreviewDataResponse } from '@server/services';
-import { TelemetryEvent } from '../telemetry/telemetry';
+} from "../utils/model";
+import { CompactTable, PreviewDataResponse } from "@server/services";
+import { TelemetryEvent } from "../telemetry/telemetry";
 
-const logger = getLogger('ModelResolver');
-logger.level = 'debug';
+const logger = getLogger("ModelResolver");
+logger.level = "debug";
 
 export enum SyncStatusEnum {
-  IN_PROGRESS = 'IN_PROGRESS',
-  SYNCRONIZED = 'SYNCRONIZED',
-  UNSYNCRONIZED = 'UNSYNCRONIZED',
+  IN_PROGRESS = "IN_PROGRESS",
+  SYNCRONIZED = "SYNCRONIZED",
+  UNSYNCRONIZED = "UNSYNCRONIZED",
 }
 
 export class ModelResolver {
@@ -193,7 +193,7 @@ export class ModelResolver {
     // check column exist and is calculated field
     const column = await ctx.modelColumnRepository.findOneBy({ id: columnId });
     if (!column || !column.isCalculated) {
-      throw new Error('Calculated field not found');
+      throw new Error("Calculated field not found");
     }
     await ctx.modelColumnRepository.deleteOne(columnId);
     return true;
@@ -267,7 +267,7 @@ export class ModelResolver {
         .map((c) => ({
           ...c,
           properties: JSON.parse(c.properties),
-          nestedColumns: c.type.includes('STRUCT')
+          nestedColumns: c.type.includes("STRUCT")
             ? modelNestedColumnList.filter((nc) => nc.columnId === c.id)
             : undefined,
         }));
@@ -289,7 +289,7 @@ export class ModelResolver {
     const modelId = args.where.id;
     const model = await ctx.modelRepository.findOneBy({ id: modelId });
     if (!model) {
-      throw new Error('Model not found');
+      throw new Error("Model not found");
     }
 
     const modelColumns = await ctx.modelColumnRepository.findColumnsByModelIds([
@@ -302,7 +302,7 @@ export class ModelResolver {
     const columns = modelColumns.map((c) => ({
       ...c,
       properties: JSON.parse(c.properties),
-      nestedColumns: c.type.includes('STRUCT')
+      nestedColumns: c.type.includes("STRUCT")
         ? modelNestedColumns.filter((nc) => nc.columnId === c.id)
         : undefined,
     }));
@@ -372,7 +372,7 @@ export class ModelResolver {
       (table) => table.name === sourceTableName,
     );
     if (!dataSourceTable) {
-      throw new Error('Table not found in the data source');
+      throw new Error("Table not found in the data source");
     }
     const properties = dataSourceTable?.properties;
     const modelValue = {
@@ -398,7 +398,7 @@ export class ModelResolver {
           displayName: column.name,
           referenceName: transformInvalidColumnName(column.name),
           sourceColumnName: column.name,
-          type: column.type || 'string',
+          type: column.type || "string",
           notNull: column.notNull || false,
           isPk: primaryKey === column.name,
           properties: column.properties
@@ -495,7 +495,7 @@ export class ModelResolver {
           displayName: column.name,
           sourceColumnName: column.name,
           referenceName: transformInvalidColumnName(column.name),
-          type: column.type || 'string',
+          type: column.type || "string",
           notNull: column.notNull,
           isPk: primaryKey === column.name,
           properties: column.properties
@@ -526,7 +526,7 @@ export class ModelResolver {
         const column = await ctx.modelColumnRepository.updateOne(id, { type });
 
         // if the struct type is changed, need to re-create nested columns
-        if (type.includes('STRUCT')) {
+        if (type.includes("STRUCT")) {
           const sourceColumn = sourceTableColumns.find(
             (sourceColumn) => sourceColumn.name === sourceColumnName,
           );
@@ -553,7 +553,7 @@ export class ModelResolver {
     const modelId = args.where.id;
     const model = await ctx.modelRepository.findOneBy({ id: modelId });
     if (!model) {
-      throw new Error('Model not found');
+      throw new Error("Model not found");
     }
 
     // related columns and relationships will be deleted in cascade
@@ -573,7 +573,7 @@ export class ModelResolver {
     // check if model exists
     const model = await ctx.modelRepository.findOneBy({ id: modelId });
     if (!model) {
-      throw new Error('Model not found');
+      throw new Error("Model not found");
     }
     const eventName = TelemetryEvent.MODELING_UPDATE_MODEL_METADATA;
     try {
@@ -786,7 +786,7 @@ export class ModelResolver {
     const viewId = args.where.id;
     const view = await ctx.viewRepository.findOneBy({ id: viewId });
     if (!view) {
-      throw new Error('View not found');
+      throw new Error("View not found");
     }
     const displayName = view.properties
       ? JSON.parse(view.properties)?.displayName
@@ -832,7 +832,7 @@ export class ModelResolver {
     });
 
     if (isEmpty(columns)) {
-      throw new Error('Failed to describe statement');
+      throw new Error("Failed to describe statement");
     }
 
     // properties
@@ -884,7 +884,7 @@ export class ModelResolver {
     const viewId = args.where.id;
     const view = await ctx.viewRepository.findOneBy({ id: viewId });
     if (!view) {
-      throw new Error('View not found');
+      throw new Error("View not found");
     }
     await ctx.viewRepository.deleteOne(viewId);
     return true;
@@ -894,7 +894,7 @@ export class ModelResolver {
     const modelId = args.where.id;
     const model = await ctx.modelRepository.findOneBy({ id: modelId });
     if (!model) {
-      throw new Error('Model not found');
+      throw new Error("Model not found");
     }
     const project = await ctx.projectService.getCurrentProject();
     const { manifest } = await ctx.mdlService.makeCurrentModelMDL();
@@ -916,7 +916,7 @@ export class ModelResolver {
     const { id: viewId, limit } = args.where;
     const view = await ctx.viewRepository.findOneBy({ id: viewId });
     if (!view) {
-      throw new Error('View not found');
+      throw new Error("View not found");
     }
     const { manifest } = await ctx.mdlService.makeCurrentModelMDL();
     const project = await ctx.projectService.getCurrentProject();
@@ -987,7 +987,7 @@ export class ModelResolver {
         mdl: manifest,
       });
     }
-    const language = project.type === DataSourceName.MSSQL ? 'tsql' : undefined;
+    const language = project.type === DataSourceName.MSSQL ? "tsql" : undefined;
     return safeFormatSQL(nativeSql, { language });
   }
 
@@ -1002,7 +1002,7 @@ export class ModelResolver {
     // check if view exists
     const view = await ctx.viewRepository.findOneBy({ id: viewId });
     if (!view) {
-      throw new Error('View not found');
+      throw new Error("View not found");
     }
 
     // update view metadata
@@ -1050,7 +1050,7 @@ export class ModelResolver {
   private determineMetadataValue(value: string) {
     // if it's empty string, meaning users want to remove the value
     // so we return null
-    if (value === '') {
+    if (value === "") {
       return null;
     }
 
